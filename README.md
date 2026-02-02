@@ -51,7 +51,7 @@ We iterated on the reconstruction model in a few steps:
 
 After doing a little bit of hyperparameter tunning and improving some logic:
 
-![Final Reconstruction](https://github.com/sergipadres/Project-AIDL/blob/main/assets/reconstruccio_embed_dim64_mask0.2_latent16_epoch100?raw=true)
+![Final Reconstruction](https://github.com/sergipadres/Project-AIDL/blob/main/assets/reconstruccio_embed_dim64_mask0.2_latent16_epoch100.png?raw=true)
 
 **Sanity check:** We also ran an “overfit one image” experiment (single sample, no masking) to verify that the autoencoder and training loop can learn a near-perfect reconstruction and confirm the autoencoder works as intended.
 

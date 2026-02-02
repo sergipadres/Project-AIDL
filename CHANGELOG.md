@@ -45,3 +45,74 @@ Comparativa entre la radiografia original i la reconstrucció del nou Decoder CN
 * **Batch Size = 64:**
     * **Canvi:** Ajust de 256 a 64.
     * **Justificació:** Tot i que 256 és més ràpid, 64 proporciona un millor gradient estocàstic (soroll beneficiós) per escapar de mínims locals i generalitzar millor en test.
+
+<br>
+
+---
+
+### 02/02/26
+
+A l'inici del fitxer de codi afegiria un comentari definint una versió, perquè ens sigui més comode referenciar-la entre nosaltres. L'actual que he modificat la he anomenat v5. També posar l'arquitectura i la data. Exemple: *v5 - Masked Autoencoder ViT + CNN decoder - 02/02/2026*
+
+### Sanity check - Overfit una imatge
+
+Pujo el codi que he usat amb el nom: `vit_train_autoencoder_overfitting1image.ipynb` a la nova carpeta /extra.
+Usa com a base el codi que va pujar la Sandra el 24 de gener.
+
+- No he usat el masking, així mirem la reconstrucció, no inpainting. `mask_ratio=0.0`
+- `weight_decay=0` perquè volem memorization. Si s'usa pot ajudar a reduir l'overfitting en datasets petits.
+- No usa `OneCycleLR` així el Learning Rate és més senzill.
+- No usa `scaler`
+- Pel dataset `BATCH_SIZE=32` i construeix un nou dataset on només usa sola imatge repetida.
+
+Resultat:
+
+![Overfitting](https://github.com/sergipadres/Project-AIDL/blob/main/assets/overfitting_one_image?raw=true)
+
+Tot i que reconstrueix bé, he fet alguns petits canvis al codi original (versió 4 que va pujar la Sandra) i ha fet que els resultats siguin menys borrosos. 
+
+
+### Modificacions fitxer vit_train_autoencoder_provaSM.py:
+
+Al `MHSelfAttentionBlock()`:
+
+Canviar: `LayerNorm((channels, self.embed_dim))` a `nn.LayerNorm(self.embed_dim)`. Abans no es feia de la manera usual que s'usa als transformers. 
+
+També el `self.mlp` a la última capa no fer l'activació `nn.SiLU()`. Pot reduir la qualitat al reconstruir i distorsionar el *residual stream*.
+
+Al `forward()` modificar la lògica de l'attention, corregint les dimensions perque usi la N (tokens) abans usava heads. També afegir una variable latent_in per sumar més tard com a attention residual. I afegir que es guardi un resultat a la variable: `self.oW` que no s'usava.
+
+<br>
+
+A la funció `ViTEncoder()`:
+
+Afegir com a parametre el `latent_per_patch=16` així no està hardcoded (i amb unes proves que he fet, el valor va millor usar 16 i no 2).
+
+Canviar aquesta línia perque usi el parametre que se li passa: `size = int(N * self.mask_ratio)`
+
+Al `forward()` el valor que posem a la mascara posar 0.0 en comptes de -1, ajuda més i és un valor dins el rang (la imatge té [0, 1]). Ara: `x[batch_indices, mask_indices, :] = 0.0`.
+
+També sumar el `self.pos_embed` després de fer el masking, per no perdre el posicionament, així el model encara sap on pertanyia el patch que falta degut a la màscara.
+A la part de `for block in self.blocks` ja no es suma la x, ja que ara el `MHSelfAttentionBlock`ja inclou internament les connexions residuals.
+
+<br>
+
+Al `CNNDecoder()`:
+
+Afegir el paràmetre `patch_size=16` per no tenir-lo hardcoded.
+
+Al `ViTMaskedAutoencoderCNN()`:
+
+Afegir el paràmetre `latent_per_patch` a tots els llocs que tocava.
+
+A la part de la inicialització del model afegir els nous parametres i els que m'han donat resultats menys borrosos: `model = ViTMaskedAutoencoderCNN(img_size=img_size, mask_ratio=0.2, embed_dim=64, latent_per_patch=16).to(DEVICE)`
+
+<br>
+
+Després dels canvis la reconstrucció queda tal que així:
+
+![Final Reconstruction](https://github.com/sergipadres/Project-AIDL/blob/main/assets/reconstruccio_embed_dim64_mask0.2_latent16_epoch100?raw=true)
+
+Usant els parametres: `embed_dim=64` `mask_ratio=0.2` `latent_per_patch=16` `epoch=100`
+
+La imatge resultant la guardo a: `assets/reconstruccio_embed_dim64_mask0.2_latent16_epoch100`

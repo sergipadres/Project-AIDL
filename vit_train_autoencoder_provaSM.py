@@ -1,3 +1,5 @@
+# v5 - Masked Autoencoder ViT + CNN decoder - 02/02/2026
+
 # --- 1. CONFIGURACIÓ ---
 !pip install medmnist
 
@@ -10,6 +12,7 @@ from tqdm.notebook import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 import gc
+import time
 
 # Neteja
 torch.cuda.empty_cache()
@@ -29,10 +32,10 @@ class PatchEmbedding(nn.Module):
         self.proj = nn.Conv2d(in_channels, embed_dim, kernel_size=patch_size, stride=patch_size)
     
     def forward(self, x):
-            x = self.proj(x)  # (Batch, embed_dim, H//patch_size, W//patch_size)
-            x = x.flatten(2).transpose(1, 2)  # (Batch, num_patches, embed_dim)
+        x = self.proj(x)  # (Batch, embed_dim, H//patch_size, W//patch_size)
+        x = x.flatten(2).transpose(1, 2)  # (Batch, num_patches, embed_dim)
 
-            return x
+        return x
 
 class MHSelfAttentionBlock(nn.Module):
     def __init__(self, channels, embed_dim, num_heads=4, mlp_hidden=48, embed_hidden=48):
@@ -41,10 +44,11 @@ class MHSelfAttentionBlock(nn.Module):
         self.embed_dim = embed_dim
         self.num_heads = num_heads
         self.embed_hidden = embed_hidden
+        assert embed_hidden % num_heads == 0, "embed_hidden must be divisible by num_heads"
         self.head_dim = self.embed_hidden // num_heads
         self.scale = self.head_dim ** -0.5
         
-        self.norm1 = nn.LayerNorm((channels, self.embed_dim))
+        self.norm1 = nn.LayerNorm(self.embed_dim)  # abans hi havia channels tambe
         
         self.preadapt = nn.Linear(self.embed_dim, self.embed_hidden)
         
@@ -55,7 +59,7 @@ class MHSelfAttentionBlock(nn.Module):
         
         self.postadapt = nn.Linear(self.embed_hidden, self.embed_dim)
         
-        self.norm2 = nn.LayerNorm((channels, self.embed_dim))
+        self.norm2 = nn.LayerNorm(self.embed_dim)
         
         self.mlp = nn.Sequential(
             nn.Linear(self.embed_dim, mlp_hidden), 
@@ -64,32 +68,36 @@ class MHSelfAttentionBlock(nn.Module):
             nn.SiLU(),
             nn.Linear(mlp_hidden, mlp_hidden), 
             nn.SiLU(),
-            nn.Linear(mlp_hidden, self.embed_dim), 
-            nn.SiLU()
+            nn.Linear(mlp_hidden, self.embed_dim)
         )
         
     def forward(self, latent):
+        latent_in = latent
         latent = self.norm1(latent)
         latent = self.preadapt(latent)
         
-        batch_size, _, _ = latent.shape
+        batch_size, N, Dh = latent.shape
         
-        q = self.qW(latent).reshape(batch_size, self.channels, self.num_heads, self.head_dim)
-        k = self.kW(latent).reshape(batch_size, self.channels, self.num_heads, self.head_dim)
-        v = self.vW(latent).reshape(batch_size, self.channels, self.num_heads, self.head_dim)
+        q = self.qW(latent).reshape(batch_size, N, self.num_heads, self.head_dim).permute(0, 2, 1, 3)
+        k = self.kW(latent).reshape(batch_size, N, self.num_heads, self.head_dim).permute(0, 2, 1, 3)
+        v = self.vW(latent).reshape(batch_size, N, self.num_heads, self.head_dim).permute(0, 2, 1, 3)
         
         attn = (q @ k.transpose(-2, -1)) * self.scale
         attn = attn.softmax(dim=-1)
-        latent = (attn @ v).transpose(0, 1).reshape(batch_size, self.channels, self.embed_hidden)
+        latent = attn @ v
         
-        latent = self.postadapt(latent)
-        latent = self.norm2(latent)
+        latent = latent.permute(0, 2, 1, 3).contiguous().reshape(batch_size, N, Dh)
 
-        x = latent + self.mlp(latent)
+        latent = self.oW(latent)
+        latent = self.postadapt(latent)
+
+        latent = latent_in + latent     # attention residual
+
+        x = latent + self.mlp(self.norm2(latent))
         return x
 
 class ViTEncoder(nn.Module):
-    def __init__(self, img_size=224, patch_size=16, in_channels=1, embed_dim=64, num_heads=4, depth=6, mask_ratio=0.5, device = DEVICE):
+    def __init__(self, img_size=224, patch_size=16, in_channels=1, embed_dim=64, num_heads=4, depth=6, mask_ratio=0.5, latent_per_patch=16, device = DEVICE):
         super().__init__()
         self.img_size = img_size
         self.patch_size = patch_size
@@ -99,6 +107,7 @@ class ViTEncoder(nn.Module):
         self.depth = depth
         self.mask_ratio = mask_ratio
         self.device = device
+        self.latent_per_patch = latent_per_patch
         
         #patchify
         self.patch_embed = PatchEmbedding(self.img_size,
@@ -119,36 +128,40 @@ class ViTEncoder(nn.Module):
         for i in range(0, len(reduced_dims)-2):
             self.mlp.append(nn.Linear(reduced_dims[i], reduced_dims[i+1]))
             self.mlp.append(nn.SiLU())
-        self.mlp.append(nn.Linear(reduced_dims[-2], 2))
+        self.mlp.append(nn.Linear(reduced_dims[-2], latent_per_patch))
 
     def forward(self, images):
-        x = self.patch_embed(images) + self.pos_embed
+        x = self.patch_embed(images)
         
-        if self.training:
-             B, N, D = x.shape
-             size = int(N * 0.5)
+        if self.training and self.mask_ratio > 0:
+             B, N, _ = x.shape
+             size = int(N * self.mask_ratio)
              mask_indices = torch.randint(0, N, (B, size), device=x.device)
              batch_indices = torch.arange(B, device=x.device).unsqueeze(1)
-             x[batch_indices, mask_indices, :] = -1 ### ARA SI QUE ACTUALITZA X!
+             x[batch_indices, mask_indices, :] = 0.0   # afegir valor 0.0 millor que -1 que no estava dins el rang de valors
+
+        x = x + self.pos_embed
 
         #forward through self-attention blocks # Passem la X modificada
-        for block in self.blocks: x = x + block(x)
+        for block in self.blocks: x = block(x)
             
         #ffn that reduces dimensionality    
         for block in self.mlp: x = block(x)
 
         
         batch_shape, _, _ = x.shape
-        x = x.reshape(batch_shape, self.num_patches*2)
+        x = x.reshape(batch_shape, self.num_patches*self.latent_per_patch)
         return x
 
 # --- 3. DECODER (CNN) - AQUEST ÉS EL NOU CANVI CLAU ---
 # Aquest decoder usa convolucions per "pintar" millor els detalls
 
 class CNNDecoder(nn.Module):
-    def __init__(self, latent_input_dim, img_size=224):
+    def __init__(self, latent_input_dim, img_size=224, patch_size=16):
         super().__init__()
-        self.map_size = img_size // 16 # 14x14
+
+        assert img_size % patch_size == 0, "img_size must be divisible by patch_size"
+        self.map_size = img_size // patch_size # 14x14
         # Calculem quants canals necessitem per encabir el vector latent en un mapa de 14x14
         self.initial_channels = latent_input_dim // (self.map_size**2)
         
@@ -191,9 +204,12 @@ class ViTMaskedAutoencoderCNN(nn.Module):
                  embed_dim=64, 
                  num_heads=4, 
                  encoder_depth=6, # canvi a 6 per velocitat
-                 mask_ratio=0.5):
+                 mask_ratio=0.5,
+                 latent_per_patch=16):
         super().__init__()
         
+        self.latent_per_patch = latent_per_patch
+
         # ENCODER (ViT)
         self.encoder = ViTEncoder(
             img_size=img_size,
@@ -202,15 +218,16 @@ class ViTMaskedAutoencoderCNN(nn.Module):
             embed_dim=embed_dim,
             num_heads=num_heads,
             depth=encoder_depth,
-            mask_ratio=mask_ratio
+            mask_ratio=mask_ratio,
+            latent_per_patch=latent_per_patch
         )
         
         # Decoder CNN (Millora la visualització)
         # Calculem la mida del vector latent que surt de l'encoder
         num_patches = (img_size // patch_size) ** 2
-        latent_dim = num_patches * 2 
+        latent_dim = num_patches * latent_per_patch
         
-        self.decoder = CNNDecoder(latent_input_dim=latent_dim, img_size=img_size)
+        self.decoder = CNNDecoder(latent_input_dim=latent_dim, img_size=img_size, patch_size=patch_size)
 
 
     def encode(self, images):
@@ -226,7 +243,7 @@ class ViTMaskedAutoencoderCNN(nn.Module):
         x_recon = self.decode(z)  # Després descomprimim
         return x_recon
 
-# --- 4. ENTRENAMENT RAPID ---
+# --- 4. LOAD DATASET ---
 
 img_size = 224
 print("Carregant dades...")
@@ -247,16 +264,19 @@ BATCH_SIZE = 64
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-model = ViTMaskedAutoencoderCNN(img_size=img_size).to(DEVICE)
+model = ViTMaskedAutoencoderCNN(img_size=img_size, mask_ratio=0.2, embed_dim=64, latent_per_patch=16).to(DEVICE)
 optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-5)
 loss_fn = nn.MSELoss()
 scaler = torch.amp.GradScaler('cuda')
 
+# --- 5. ENTRENAMENT RAPID ---
 
-epochs = 100  # <--- Farem que aprengui els detalls fins
+epochs = 100
 scheduler = optim.lr_scheduler.OneCycleLR(optimizer, max_lr=1e-3, steps_per_epoch=len(train_loader), epochs=epochs)
 
-print("Iniciant entrenament i amb millor qualitat visual...")
+start_time = time.time()
+
+print("Iniciant entrenament")
 
 train_losses = []
 val_losses = []
@@ -295,7 +315,12 @@ for epoch in range(epochs):
     val_losses.append(val_loss)
     print(f"Epoch {epoch+1}: Train Loss={train_loss:.5f}, Val Loss={val_loss:.5f}")
 
+total_time = (time.time() - start_time)/60
+print(f"\nTotal time {total_time: .4f} min")
+
+
 # --- 5. RESULTATS ---
+
 print("\nVisualitzant resultats...")
 model.eval()
 with torch.no_grad():
@@ -317,3 +342,7 @@ plt.show()
 # Guardem l'Encoder per utilitzar-lo a la següent fase
 torch.save(model.encoder.state_dict(), "encoder_vit_ready.pth")
 print(" Encoder guardat!")
+
+# Descomentar per guardar tambe l'autoencoder
+#torch.save(model.state_dict(), "autoencoder_vit_ready.pth")
+#print("Autoencoder guardat!")

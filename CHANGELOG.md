@@ -67,7 +67,7 @@ Usa com a base el codi que va pujar la Sandra el 24 de gener.
 
 Resultat:
 
-![Overfitting](https://github.com/sergipadres/Project-AIDL/blob/main/assets/overfitting_one_image?raw=true)
+![Overfitting](assets/overfitting_one_image.png)
 
 Tot i que reconstrueix bé, he fet alguns petits canvis al codi original (versió 4 que va pujar la Sandra) i ha fet que els resultats siguin menys borrosos. 
 
@@ -111,8 +111,9 @@ A la part de la inicialització del model afegir els nous parametres i els que m
 
 Després dels canvis la reconstrucció queda tal que així:
 
-![Final Reconstruction](https://github.com/sergipadres/Project-AIDL/blob/main/assets/reconstruccio_embed_dim64_mask0.2_latent16_epoch100?raw=true)
+![Final Reconstruction](assets/reconstruccio_embed_dim64_mask0.2_latent16_epoch100.png)
 
 Usant els parametres: `embed_dim=64` `mask_ratio=0.2` `latent_per_patch=16` `epoch=100`
+
 
 La imatge resultant la guardo a: `assets/reconstruccio_embed_dim64_mask0.2_latent16_epoch100`

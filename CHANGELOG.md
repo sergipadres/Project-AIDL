@@ -117,3 +117,39 @@ Usant els parametres: `embed_dim=64` `mask_ratio=0.2` `latent_per_patch=16` `epo
 
 
 La imatge resultant la guardo a: `assets/reconstruccio_embed_dim64_mask0.2_latent16_epoch100`
+
+### 07/02/26
+
+### "Evolució de l'Arquitectura (Model Log)"
+
+## Objectiu
+Dissenyar un Autoencoder capaç de comprimir radiografies de tòrax (**PneumoniaMNIST**) en un espai latent compacte i continu, apte per a la generació posterior mitjançant *Flow Matching*.
+
+---
+
+### Versió 1: U-Net Autoencoder Determinista (Baseline)
+
+* **Data:** 04/02/2026
+* **Arquitectura:** U-Net amb backbone ResNet18.
+* **Estratègia Latent:** Vector lineal $z \in \mathbb{R}^{256}$ (Compressió total).
+* **Innovació:** Implementació de **"Skip Dropout"**.
+    * *Problema detectat:* En arquitectures U-Net estàndard, les connexions residuals permeten filtrar informació d'alta freqüència directament al decoder, evitant que l'encoder aprengui una representació latent significativa (el model "fa trampes").
+    * *Solució:* Es va aplicar un `dropout=1.0` a les connexions residuals durant la primera fase d'entrenament (bloqueig estructural) i `dropout=0.5` durant el refinament.
+* **Resultat:** Reconstruccions correctes estructuralment.
+* **Limitació:** L'espai latent resultant, al ser determinista, presentava discontinuïtats ("forats" entre pacients), fent-lo inviable per a la generació de noves mostres amb models de difusió.
+
+---
+
+###  Versió 2: Spatial VAE (Arquitectura Final - State of the Art)
+
+* **Data:** 07/02/2026
+* **Canvi de Paradigma:** Transició de vector pla a **Latent Espacial**.
+* **Arquitectura:**
+    * Es substitueix la capa lineal del coll d'ampolla per convolucions $1 \times 1$.
+    * **Nou espai latent:** Tensor de dimensions $(4 \times 7 \times 7)$. Es manté la coherència espacial (dalt/baix, esquerra/dreta) en la representació comprimida.
+    * Introducció del mostreig probabilístic (*Reparameterization Trick*) per garantir continuïtat (manifold suau).
+* **Validació Quantitativa (PCA):**
+    * L'anàlisi de components principals sobre el conjunt de validació mostra una separació clara entre classes.
+    * **Distància Euclidiana entre centroides (Sa vs. Pneumònia):** **27.57**.
+* **Conclusió:** Aquesta arquitectura resol el problema de continuïtat de la versió amb la U-Net i augmenta dràsticament la interpretabilitat de la patologia. Candidata a model definitiu per a l'extracció de latents.
+

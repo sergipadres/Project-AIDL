@@ -233,6 +233,7 @@ Aquest procés genera múltiples latents intermedis entre l'estat sa i el de pne
 
 S’ha generat la primera trajectòria completa:
 
-![Trajectòria Generada](/assets/tragectoria_FM_v1)
+![Trajectòria Generada](/assets/trajectoria_FM_v1)
+
 
 

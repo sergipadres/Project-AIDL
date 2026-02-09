@@ -153,3 +153,86 @@ Dissenyar un Autoencoder capaç de comprimir radiografies de tòrax (**Pneumonia
     * **Distància Euclidiana entre centroides (Sa vs. Pneumònia):** **27.57**.
 * **Conclusió:** Aquesta arquitectura resol el problema de continuïtat de la versió amb la U-Net i augmenta dràsticament la interpretabilitat de la patologia. Candidata a model definitiu per a l'extracció de latents.
 
+### 09/02/26 - v7_Latent_Flow_Matching_09022026.ipynb
+
+## Flow Matching sobre l’Espai Latent
+
+Després de consolidar el **Spatial VAE** com a extractor de representacions contínues, s'introdueix el mòdul de **Flow Matching** per modelar la dinàmica entre estats latents. Aquesta fase transforma de l'autoencoder reconstructiu a un **model generatiu dinàmic** capaç de simular trajectòries entre estats clínics, en el nostre cas, pneumonies.
+
+**Objectiu:** Aprendre el **camp de velocitat** que transforma un latent de pacient sa en un latent de pneumònia dins l’espai latent del VAE.  
+En lloc de generar imatges directament, el model aprèn:
+
+$$dz/dt = v(z, t)$$
+
+És a dir, com es mou un punt dins l'espai latent al llarg del temps.
+
+---
+
+
+## 1. Construcció del Dataset de Latents
+
+* **Canvi:** Creació d’un dataset específic per entrenar el Flow.
+* **Contingut:** Parelles `(z, label)`.
+
+El model necessita parelles de trajectòria:
+* $z_0$: Latent de pacient **SA**.
+* $z_1$: Latent de pacient **PNEUMÒNIA**.
+
+Aquestes parelles defineixen l’inici i el final de la trajectòria de transformació.
+
+---
+
+## 2. Interpolació temporal
+
+Per entrenar el model no es simula tota la trajectòria, sinó punts intermedis aleatoris. S'utilitza la interpolació:
+$$z_t = (1 - t) \cdot z_0 + t \cdot z_1$$
+
+on:
+* $t$ entre 0 i 1 és un instant de temps aleatori.
+* $z_t$ és un estat intermedi del procés patològic.
+
+Això permet entrenar el model amb un únic pas de regressió.
+
+---
+
+## 3. Objectiu d’entrenament (Velocity Matching)
+
+El model aprèn la velocitat que connecta els dos estats:
+$$real = z_1 - z_0$$
+
+La **loss** força que el model compleixi:
+$$v(z_t, t) \approx z_1 - z_0$$
+
+$$Loss = || v_{pred} - (z_1 - z_0) ||^2$$
+
+Aquest pas converteix el problema en l'aprenentatge d’un **camp vectorial continu**.
+
+---
+
+## 4. Model del Camp Vectorial (Flow CNN)
+
+* **Arquitectura:** CNN aplicada sobre el latent espacial.
+* **Entrada del model:** `input = concat(z, t)`.
+
+El temps es converteix en un mapa espacial i s’afegeix com a canal extra. 
+
+**Interpretació:** El model respon a  la pregunta: *"Si estic en aquest punt del latent i en aquest instant temporal, cap a on m’he de moure?"*
+
+---
+
+## 5. Integració ODE (Generació de Trajectòries)
+
+Un cop entrenat el camp vectorial, es pot generar la trajectòria completa integrant l'Equació Diferencial Ordinària (ODE). 
+
+**Integrador utilitzat:** Euler
+$$z(t + \Delta t) = z(t) + v(z, t) \cdot \Delta t$$
+
+Aquest procés genera múltiples latents intermedis entre l'estat sa i el de pneumònia.
+
+## Resultat
+
+S’ha generat la primera trajectòria completa:
+
+![Trajectòria Generada](/assets/tragectoria_FM_v1)
+
+

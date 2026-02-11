@@ -237,4 +237,12 @@ S’ha generat la primera trajectòria completa:
 
 
 
+### 11/02/26 - Addition of metric learning and Geodesic correction training
 
+We learn a radial basis function metric in the latent space.
+The metric works by fitting k-means to the latents of the dataset, and then learning distances from the k-means clusters as belonging to the latent distribution.
+
+Once the metric is learnt it is used to train a geodesic correction of the interpolants calculation such that newly computed
+interpolants will fall close to the latent distribution.
+
+---

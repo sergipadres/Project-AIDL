@@ -245,4 +245,17 @@ The metric works by fitting k-means to the latents of the dataset, and then lear
 Once the metric is learnt it is used to train a geodesic correction of the interpolants calculation such that newly computed
 interpolants will fall close to the latent distribution.
 
----
+
+### 12/02/26 - Addition of multi-stage autoencoder
+
+This autoencoder reconstructs from a latent of size 98 using interpolated upscaling.
+Interpolations allow to grow feature maps in fractional steps. With more steps we may achieve
+better reconstruction quality.
+
+Another novelty is that it uses Convolutional Block Attention Modules (https://www.digitalocean.com/community/tutorials/attention-mechanisms-in-computer-vision-cbam) which should allow the model to focus on more relevant parts of the feature maps for reconstruction.
+
+The mask during training was 0.5. This time a learned parameter is used for the mask.
+The encoder embedding is also updated for RoPE.
+
+Finally, it is trained using Perceptual Similarity loss  on top of L1 distance.
+(https://github.com/richzhang/PerceptualSimilarity)

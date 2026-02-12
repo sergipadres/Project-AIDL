@@ -6,7 +6,7 @@
 - Arnau Claramunt
 - Sandra Márquez
 - Sergi Padrés
-- Albert Vi
+- Albert Vidal
 
 Project advisor:
 - Òscar Pina 

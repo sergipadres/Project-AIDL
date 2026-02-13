@@ -67,7 +67,7 @@ class CustomLatentsDataset(Dataset):
         return len(self.latents)
 
     def __getitem__(self,idx):
-        return latents[idx]
+        return self.latents[idx]
 
 print("--------------Fitting Kmeans---------------")
 metric = RBFMetric().cuda()

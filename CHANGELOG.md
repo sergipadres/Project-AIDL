@@ -259,3 +259,28 @@ The encoder embedding is also updated for RoPE.
 
 Finally, it is trained using Perceptual Similarity loss  on top of L1 distance.
 (https://github.com/richzhang/PerceptualSimilarity)
+
+
+### 13/02 - Crear fitxer train Metric Flow Matching i usar latents existents
+
+Codi que ajunta el MFM del Albert amb les latents (antigues en vectors i 256 Dim) de la Sandra. Ja que el codi assumeix els inputs de la RBFMetric com a flat vectors.
+Un cop funcioni millorar a usar les latents de features map (`latents_pure_train.npy`).
+
+Canvis al codi respecte el codi de metric learning and Geodesic correction training:
+
+- Afegir load de les latents, en comptes d’usar autoencoder.
+- Treure del inici: torch.set_default_dtype(torch.float16)
+- Afegir guardar correctament part de metrica i poder fer load de tot.
+- Fer un metric sanity check al final
+- loss.backward(retain_graph=True)   treure el retain_graph, gasta mes memòria
+- El W en el metric no posar-lo float 16. Ara tot fp32, sinó podia donar mala resolució de gradients i l'aprenentatge dels pesos inestable
+- Cambiar el clamp W a softplus parametrization. Es força valors positius i es normalitza, així l'output és (0, 1]
+- Fix dels index en el compute_cluster_points_indexes, abans retornava labels
+- Treure el clamp i 1 - abs(1-metric)
+- Afegir parametre eps=1e-8 (deixar-lo per defecte) no és gaire rellevant
+- Actualitzar la logica del forward a la classe RBFMetric
+- Afegir nous atributs de: cluster_sizes...
+
+Estat actual: s’ha trobat un outlier amb una lambda, i els kernels es fan estrets i fa underflow a 0.  (Cosa a tenir en compte)
+
+Queda pendent alguns fixes per entrenar Gamma i el Vector Field.

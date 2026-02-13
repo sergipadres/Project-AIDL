@@ -261,7 +261,7 @@ Finally, it is trained using Perceptual Similarity loss  on top of L1 distance.
 (https://github.com/richzhang/PerceptualSimilarity)
 
 
-### 13/02 - Crear fitxer train Metric Flow Matching i usar latents existents
+### 13/02/26 - Crear fitxer train Metric Flow Matching i usar latents existents
 
 Codi que ajunta el MFM del Albert amb les latents (antigues en vectors i 256 Dim) de la Sandra. Ja que el codi assumeix els inputs de la RBFMetric com a flat vectors.
 Un cop funcioni millorar a usar les latents de features map (`latents_pure_train.npy`).

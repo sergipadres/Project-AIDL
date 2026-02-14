@@ -293,7 +293,7 @@ Queda pendent alguns fixes per entrenar Gamma i el Vector Field.
 
 - Alta Resolució Latent ($14 \times 14$): Modificació de l'extracció de característiques de la ResNet18 (tallant a la Layer 3 en lloc de l'última) per augmentar el mapa espacial de $4 \times 7 \times 7$ a $4 \times 14 \times 14$. Això preserva millor les formes detallades de la patologia.
 
--Capa Sigmoid Final: Inclusió d'una capa Sigmoid a la sortida del Decoder per forçar que la imatge generada estigui estrictament en el rang normatiu $[0, 1]$, evitant aberracions de contrast (píxels grisos) en interpolacions i reconstruccions.
+- Capa Sigmoid Final: Inclusió d'una capa Sigmoid a la sortida del Decoder per forçar que la imatge generada estigui estrictament en el rang normatiu $[0, 1]$, evitant aberracions de contrast (píxels grisos) en interpolacions i reconstruccions.
 
 ## Funcions de Pèrdua (Loss) - Idea de l'Albert -
 
@@ -308,4 +308,5 @@ VGG16 Perceptual Loss: Substitució de l'error MSE clàssic per una combinació 
 - Sanity Check Espacial ("Frankenstein Test"): Validació superada. Es va demostrar que l'espai latent manté la topologia 2D fusionant la meitat d'un latent "Sa" amb la meitat d'un latent "Pneumònia", resultant en una imatge reconstruïda meitat sana/meitat malalta.
   
 - Extracció Clean Data: Generació i guardat amb èxit dels nous conjunts de latents definitius (latents_train.npy i latents_val.npy) amb dimensió (N, 4, 14, 14), llestos per ser usats com a entrada baseline per al mòdul de Flow Matching.
+
 

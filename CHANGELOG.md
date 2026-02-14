@@ -307,6 +307,7 @@ VGG16 Perceptual Loss: Substitució de l'error MSE clàssic per una combinació 
 
 - Sanity Check Espacial ("Frankenstein Test"): Validació superada. Es va demostrar que l'espai latent manté la topologia 2D fusionant la meitat d'un latent "Sa" amb la meitat d'un latent "Pneumònia", resultant en una imatge reconstruïda meitat sana/meitat malalta.
   
-- Extracció Clean Data: Generació i guardat amb èxit dels nous conjunts de latents definitius (latents_train.npy i latents_val.npy) amb dimensió (N, 4, 14, 14), llestos per ser usats com a entrada baseline per al mòdul de Flow Matching.
+- Extracció Clean Data: Generació i guardat amb èxit dels nous conjunts de latents definitius (latents_train_VAE_14_02_2026.npy i labels_train_VAE_14_02_2026.npy, també em guardo els corresponents als de validació) amb dimensió (N, 4, 14, 14), llestos per ser usats com a entrada baseline per al mòdul de Flow Matching.
+
 
 

@@ -284,3 +284,28 @@ Canvis al codi respecte el codi de metric learning and Geodesic correction train
 Estat actual: s’ha trobat un outlier amb una lambda, i els kernels es fan estrets i fa underflow a 0.  (Cosa a tenir en compte)
 
 Queda pendent alguns fixes per entrenar Gamma i el Vector Field.
+
+### 14/02/2026 - Refactorització a Spatial VAE High-Res (v2.0)
+
+## Noves Funcionalitats i Arquitectura:
+
+- Transició a VAE Pur (Zero Skips): Eliminació completa de les skip connections tipus U-Net. Ara l'arquitectura és un "bottleneck" real que força el model a comprimir tota la informació semàntica dins l'espai latent.
+
+- Alta Resolució Latent ($14 \times 14$): Modificació de l'extracció de característiques de la ResNet18 (tallant a la Layer 3 en lloc de l'última) per augmentar el mapa espacial de $4 \times 7 \times 7$ a $4 \times 14 \times 14$. Això preserva millor les formes detallades de la patologia.
+
+-Capa Sigmoid Final: Inclusió d'una capa Sigmoid a la sortida del Decoder per forçar que la imatge generada estigui estrictament en el rang normatiu $[0, 1]$, evitant aberracions de contrast (píxels grisos) en interpolacions i reconstruccions.
+
+## Funcions de Pèrdua (Loss) - Idea de l'Albert -
+
+VGG16 Perceptual Loss: Substitució de l'error MSE clàssic per una combinació de L1 Loss + VGG Perceptual Loss (amb normalització d'ImageNet). Això penalitza la pèrdua de textures i elimina l'efecte "borrós" típic dels VAEs, generant vores i costelles molt més nítides. 
+
+## Optimització d'Entrenament (GPU)
+
+-Gestió de Memòria: Implementació de Gradient Accumulation i Automatic Mixed Precision (AMP) (torch.cuda.amp). Això permet simular Batch Sizes grans (ex: 32) processant paquets petits, adaptant el model complex de $224 \times 224$ a GPUs de 14GB sense trencar la memòria.
+
+## Validació i Extracció de Dades
+
+- Sanity Check Espacial ("Frankenstein Test"): Validació superada. Es va demostrar que l'espai latent manté la topologia 2D fusionant la meitat d'un latent "Sa" amb la meitat d'un latent "Pneumònia", resultant en una imatge reconstruïda meitat sana/meitat malalta.
+  
+- Extracció Clean Data: Generació i guardat amb èxit dels nous conjunts de latents definitius (latents_train.npy i latents_val.npy) amb dimensió (N, 4, 14, 14), llestos per ser usats com a entrada baseline per al mòdul de Flow Matching.
+

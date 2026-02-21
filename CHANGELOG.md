@@ -310,4 +310,43 @@ VGG16 Perceptual Loss: Substitució de l'error MSE clàssic per una combinació 
 - Extracció Clean Data: Generació i guardat amb èxit dels nous conjunts de latents definitius (latents_train_VAE_14_02_2026.npy i labels_train_VAE_14_02_2026.npy, també em guardo els corresponents als de validació) amb dimensió (N, 4, 14, 14), llestos per ser usats com a entrada baseline per al mòdul de Flow Matching.
 
 
+## 2026-02-21: VAE High-Res Upgrade & version 2 TorchXRayVision Integration
+
+### 1. Custom VAE High-Res ($4 \times 28 \times 28$)
+En aquesta primera iteració, es va optimitzar l'arquitectura base (ResNet18) per maximitzar la retenció d'estructures anatòmiques fines, sacrificant un nivell de compressió a favor de la fidelitat visual.
+
+* **Script d'Entrenament:** `v9_vae_28x28_res.py` 
+* **Directori d'Artefactes:** `./artifacts_final/`
+* **Pesos del Model:** * Model complet: `vae_final_sigmoid.pth`
+    * Només Decoder: `decoder_only_final.pth`
+* **Matrius de Latents (Input per a Flow Matching):**
+    * Train: `latents_train_v9.npy` i `labels_train_v9.npy`
+    * Val: `latents_val_v9.npy` i `labels_val_v9.npy`
+* **Ajust d'Arquitectura:** Ampliació del coll d'ampolla (*bottleneck*) dinàmic. L'espai latent va passar de $4 \times 14 \times 14$ a una resolució de $4 \times 28 \times 28$ (3.136 dimensions).
+* **Impacte Visual:** Millora en la nitidesa anatòmica. Les estructures òssies i les vores cardíaques es reconstrueixen sense artefactes de borrositat.
+* **Espai Latent (PCA):** Separació basal estructurada entre classes aconseguint una distància euclidiana entre centroides de **26.51**.
+
+### 2. Clinical Expert VAE (Transfer Learning amb TorchXRayVision)
+En la segona iteració, es va substituir l'*encoder* genèric per un model expert en domini mèdic per capturar característiques clínicament rellevants (patologies) en lloc de simples textures.
+
+* **Script d'Entrenament:** `v10_train_vae_xrv.py` 
+* **Directori d'Artefactes:** `./artifacts_xrv/`
+* **Pesos del Model:** * Model complet: `vae_xrv_final.pth`
+    * Només Decoder: `decoder_xrv_final.pth`
+* **Matrius de Latents (Input per a Flow Matching):**
+    * Train: `latents_xrv_train.npy` i `labels_xrv_train.npy`
+    * Val: `latents_xrv_val.npy` i `labels_xrv_val.npy`
+* **Cirurgia de Model:** Integració del model `XRV-ResNetAE-101-elastic` de la llibreria `torchxrayvision`. Extracció de tensors de 512 canals mantenint la resolució de $28 \times 28$.
+* **Entrenament Bifàsic:** 20 *epochs* de *Warm-up* (encoder congelat) + 60 *epochs* de *Fine-Tuning* (descongelació total, LR `1e-5`). Convergència per *Early Stopping* a l'epoch 80.
+* **Fites de Rendiment:**
+    * **Loss L1:** **0.0197**.
+    * **Salt qualitatiu en PCA:** La distància entre centroides va augmentar a **30.97** (un increment substancial en la separabilitat de la patologia).
+    * **Salut de l'Espai Latent:** Distància mitjana entre veïns de **57.78**, assegurant una distribució àmplia i rica en variància.
+
+### Millores Generals del Pipeline
+* **Early Stopping Automàtic:** Integrat amb una paciència de 15 *epochs* per evitar *overfitting* i optimitzar el temps de còmput.
+* **Mètriques Desacoblades:** Intent sense èxit d'integració de TensorBoard mesurant independentment *L1 Pixel Loss*, *VGG Perceptual Loss* i *KL Divergence*.
+
+
+
 

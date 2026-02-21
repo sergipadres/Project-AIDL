@@ -323,6 +323,7 @@ En aquesta primera iteració, es va optimitzar l'arquitectura base (ResNet18) pe
     * Train: `latents_train_v9.npy` i `labels_train_v9.npy`     
     * Val: `latents_val_v9.npy` i `labels_val_v9.npy`           
 * **Ajust d'Arquitectura:** Ampliació del coll d'ampolla (*bottleneck*) dinàmic. L'espai latent va passar de $4 \times 14 \times 14$ a una resolució de $4 \times 28 \times 28$ (3.136 dimensions).
+* **Epochs:** VAE entrenat amb 100 epochs.
 * **Impacte Visual:** Millora en la nitidesa anatòmica. Les estructures òssies i les vores cardíaques es reconstrueixen sense artefactes de borrositat.
 * **Espai Latent (PCA):** Separació basal estructurada entre classes aconseguint una distància euclidiana entre centroides de **26.51**.
 
@@ -337,7 +338,7 @@ En la segona iteració, es va substituir l'*encoder* genèric per un model exper
     * Train: `latents_xrv_train.npy` i `labels_xrv_train.npy`  
     * Val: `latents_xrv_val.npy` i `labels_xrv_val.npy`        
 * **Cirurgia de Model:** Integració del model `XRV-ResNetAE-101-elastic` de la llibreria `torchxrayvision`. Extracció de tensors de 512 canals mantenint la resolució de $28 \times 28$.
-* **Entrenament Bifàsic:** 20 *epochs* de *Warm-up* (encoder congelat) + 60 *epochs* de *Fine-Tuning* (descongelació total, LR `1e-5`). Convergència per *Early Stopping* a l'epoch 80.
+* **Entrenament Bifàsic:** 20 *epochs* de *Warm-up* (encoder congelat) + 60 *epochs* de *Fine-Tuning* (descongelació total, LR `1e-5`). Convergència per *Early Stopping* a l'epoch 80 inicialment s'havia configurat per entrenar amb 100 *epochs*.
 * **Fites de Rendiment:**
     * **Loss L1:** **0.0197**.
     * **Salt qualitatiu en PCA:** La distància entre centroides va augmentar a **30.97** (un increment substancial en la separabilitat de la patologia).
@@ -348,6 +349,7 @@ En la segona iteració, es va substituir l'*encoder* genèric per un model exper
 * **Mètriques Desacoblades:** Intent sense èxit d'integració de TensorBoard mesurant independentment *L1 Pixel Loss*, *VGG Perceptual Loss* i *KL Divergence*.
 
 Compartit al drive els arxius esmentats necessaris perquè ara ja pesen molt. Quan tingui el codi net, sí que el pujaré aquí al GitHub.
+
 
 
 

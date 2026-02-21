@@ -42,7 +42,7 @@ class SpatialVAE(nn.Module):
     #interpolants
     def get_spatial_latent(self, image):
         mu, log_var = self.encode(images)
-        z = torch.normal(mu, totorch.exp(0.5 * log_var))
+        z = torch.normal(mu, torch.exp(0.5 * log_var))
         return z
 
     #this is for decoding the spatial latent

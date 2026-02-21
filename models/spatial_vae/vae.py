@@ -37,6 +37,22 @@ class SpatialVAE(nn.Module):
         out = self.decoder(out)
         return out
 
+    #this is for encoding in flow matching (inference)
+    #it produces the spatial latent useful to generate
+    #interpolants
+    def get_spatial_latent(self, image):
+        mu, log_var = self.encode(images)
+        z = torch.normal(mu, totorch.exp(0.5 * log_var))
+        return z
+
+    #this is for decoding the spatial latent
+    def reconstruct_from_spatial_latent(self, z):
+        out = self.decoder_input(z)
+        out = self.decoder(out)
+        return out
+
+
+    #this is for generation in validation sampling
     def sample(self, mu, log_var):
         z = torch.normal(mu, torch.exp(0.5 * log_var))
         out = self.decoder_input(z)

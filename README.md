@@ -52,7 +52,7 @@ We iterated on the reconstruction model in a few steps:
 
 ![Final Reconstruction](https://github.com/sergipadres/Project-AIDL/blob/main/assets/reconstruccio_final.png?raw=true)
 
-After doing a little bit of hyperparameter tunning and improving some logic:
+After doing a little bit of hyperparameter tuning and improving some logic:
 
 ![Final Reconstruction](https://github.com/sergipadres/Project-AIDL/blob/main/assets/reconstruccio_embed_dim64_mask0.2_latent16_epoch100.png?raw=true)
 
@@ -99,7 +99,7 @@ The figure shows a generated **latent-space trajectory**: starting from a **heal
 ![Flow trajectory](https://github.com/sergipadres/Project-AIDL/blob/main/assets/trajectoria_FM_v1.png?raw=true)
 
 
-### 9. **Metric flow Matching**
+### 9. **Metric Flow Matching**
 
 We add a manifold-awareness layer on top of baseline Flow Matching to avoid off-manifold latent trajectories.
 
@@ -109,6 +109,62 @@ We add a manifold-awareness layer on top of baseline Flow Matching to avoid off-
 - **Vector field training:** compute training targets (conditional flows) along these **metric-corrected interpolants** and train the final **flow model** to predict the latent velocity field.
 
 **Key idea:** instead of learning trajectories that may cut through unrealistic latent regions, we learn trajectories that remain close to the latent distribution, improving realism when decoding intermediate states.
+
+
+### 10. **Multi-stage Autoencoder (latent = 98)**
+
+Added a **multi-stage autoencoder** that reconstructs from a **98-dim latent** using **interpolated upscaling**.  
+Interpolation-based upsampling allows feature maps to grow in *fractional* steps.
+
+Key additions:
+- **Interpolated upscaling** (multi-stage) for smoother detail recovery.
+- **CBAM attention (Convolutional Block Attention Module)** to focus reconstruction on the most relevant feature-map regions
+- **Masking update:** previously we used a fixed mask ratio (0.5). Now the mask is a **learned parameter**.
+- **RoPE embedding update** in the encoder.
+- **Loss:** trained with **L1 + Perceptual Similarity (LPIPS)**
+
+### 11. **Spatial VAE High-Res (v2.0) — Pure VAE, Zero Skips**
+
+**New architecture & features**
+- **Pure VAE (Zero Skips):** full removal of U-Net skip connections. The model becomes a real bottleneck that forces semantic compression into the latent space.
+- **Higher-res latent:** we modified the ResNet18 feature extraction by cutting at **Layer 3** (instead of the final stage), increasing the latent map from **4 × 7 × 7 → 4 × 14 × 14** to preserve pathology shape detail.
+- **Final Sigmoid layer:** decoder output is constrained to **[0, 1]**, preventing contrast artifacts (gray-ish pixels) in reconstructions/interpolations.
+- **VGG16 perceptual loss** + **L1** (with ImageNet normalization), replacing classic MSE. This penalizes texture loss and reduces the typical VAE blur, yielding sharper ribs/edges.
+- **Memory management:** implemented **Gradient Accumulation** + **Automatic Mixed Precision (torch.cuda.amp)** to simulate larger batch sizes (e.g., 32) on ~14GB GPUs for 224×224 training.
+
+**Validation & data extraction**
+- **Spatial sanity check (“Frankenstein Test”):** passed. We fused half of a “Healthy” latent with half of a “Pneumonia” latent and decoded a half-healthy/half-ill image, showing the latent preserves 2D topology.
+
+### 12. **VAE High-Res Upgrade + TorchXRayVision Integration (v2)**
+
+Custom VAE High-Res now with latents of (4 × 28 × 28). We optimized the base ResNet18 VAE to maximize fine anatomical structure retention, trading compression for visual fidelity.
+
+Visual impact: sharper anatomy (bone structures + cardiac borders) with fewer blur artifacts.
+
+Latent PCA: baseline class separation with centroid Euclidean distance 26.51.
+
+**Clinical Expert VAE (Transfer Learning with TorchXRayVision)**
+
+We replaced the generic encoder with a medical-domain expert model to capture *clinically relevant* patterns (pathology) instead of low-level textures.
+
+- **Model surgery:** integrated `XRV-ResNetAE-101-elastic` (torchxrayvision), extracting **512-channel** tensors while keeping **28 × 28** resolution.
+- **Two-phase training:**
+  - 20 epochs warm-up (frozen encoder)
+  - 60 epochs **fine-tuning** (full unfreeze), LR = `1e-5`
+  - **Early stopping** converged around epoch ~80 (initial plan was 100 epochs)
+  - **PCA centroid distance:** **30.97** (substantial increase in pathology separability)
+
+#### Pipeline improvements
+- **Automatic Early Stopping:** patience = 15 epochs (reduced overfitting + compute time).
+
+
+### 13. Metric Flow Matching (MFM) v2 — Unpaired Patients + Flat Latents
+
+Goal: train the final **vector field** (latent velocity) for Metric Flow Matching. After this code, everything is ready to use the vector field and generate intermediate latents using the flat_latent_ode_inference_unpaired code.
+
+What changed in v2:
+- **Unpaired setting:** we do **not** use endpoint-conditioned (patient-specific) pairs. We learn a global disease-direction flow.
+- **Flat latent vectors:** experiments start with the **multi-stage AE** flat latent (98 dims), before extending to other latent types. And add the class definition of this autoencoder and load the state_dict weights to generate the latents on this code.
 
 
 <br>

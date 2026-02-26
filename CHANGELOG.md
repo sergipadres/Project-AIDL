@@ -351,7 +351,19 @@ En la segona iteració, es va substituir l'*encoder* genèric per un model exper
 Compartit al drive els arxius esmentats necessaris perquè ara ja pesen molt. Quan tingui el codi net, sí que el pujaré aquí al GitHub.
 
 
+## 26/02/2026: Acabar MFM flat vector latent unpaired patients
+El codi: `v2_training_metric_flow_matching_26022026.ipynb` conté com a objectiu final l'entrenament del vector field.
 
+Entrenar una mètrica (RBFMetric) alta quan z és a prop del manifold/distribució de latents. A partir d’aquest score construïm el cost de la mètrica. La Gamma s’entrena usant la metrica entrenada i aprèn una correcció, que fa corbar la línia recta entre punts finals, que fa que siguí un camí que es manté a prop del manifold. El vector field usa la gamma pel training i acaba sent la velocity que el flow ha de seguir. El resultat és el learned vector field que usa el codi del Sergi.
 
+Aquesta versió 2 usa unpaired patients (no fem endpoint-conditioned) i usa flat vectors. Inicialment es prova amb el multi-stage autoencoder de l’Albert de 98 dim el flat vector de latents.
 
+Canvis al Vector Field:
 
+Abans fèiem que el timestep_embed agrupés tota la info del temps, ara ho fa en hidden_dim, no en una sola dimensió. I ara es pot combinar amb les latent features en el hidden space.
+
+No aplicar `silu` al output del vector field, pot distorsionar la senyal/magnitud. Deixem l’output lineal i deixem que la velocitat output en espai latent sigui positiva o negativa sense restringir la magnitud.
+
+Traiem `timesteps = linspace(...)` feia que estigui lligat al nombre d’imatges.
+
+Paper del Riemannian metric que considera la geometria (https://arxiv.org/pdf/2008.00565)

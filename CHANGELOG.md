@@ -366,4 +366,29 @@ No aplicar `silu` al output del vector field, pot distorsionar la senyal/magnitu
 
 Traiem `timesteps = linspace(...)` feia que estigui lligat al nombre d’imatges.
 
+
 Paper del Riemannian metric que considera la geometria (https://arxiv.org/pdf/2008.00565)
+
+## 27/02/2026: Inference RK4 sobre MFM Flat 98D + Visualització de Trajectòria
+
+Després de completar l’entrenament del Metric Flow Matching (MFM) unpaired en espai latent flat 98D, s’implementa la fase completa d’inferència ODE amb integrador d’ordre superior i visualització clínica de la progressió.
+
+Notebook associat: `v3_training_metric_flow_matching_with_generation_26022026.ipynb`
+
+Objectiu: Generar una trajectòria latent contínua partint d’un pacient sa real, integrant el vector field entrenat amb MFM i reconstruint els estats intermedis mitjançant el multi-stage autoencoder (latent 98D).
+
+Model utilitzat:
+* Vector Field entrenat amb MFM unpaired
+* Autoencoder multi-stage (latent_dim=98)
+* Integració ODE amb Runge-Kutta 4 (RK4)
+
+Pipeline inferencia: 
+
+Healthy Image -> Encoder (AE 98D) -> z0 -> RK4 Integration amb VectorField MFM -> {z_t} trajectòria completa -> Decoder multi-stage -> Seqüència d’imatges (progressió)
+
+S’ha generat la trajectòria completa des de t=0 fins t=1 amb 80 passos RK4. Imatge guardada a `/assets/MFM_RK4_flat98.png`
+
+Proper Pas - Migrar MFM a:
+* Latents espacials (4×28×28)
+* Vector Field tipus U-Net
+* Flow Matching sobre tensors espacials

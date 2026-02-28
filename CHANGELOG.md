@@ -392,3 +392,12 @@ Proper Pas - Migrar MFM a:
 * Latents espacials (4×28×28)
 * Vector Field tipus U-Net
 * Flow Matching sobre tensors espacials
+
+## 28/02/2026 : Millores Spatial VAE amb model Torchxrayvision (Nitidesa i Estabilitat Numèrica)
+
+* **Transició a BCEWithLogitsLoss:** Es va substituir la mètrica de pèrdua de píxel original (L1 Loss) per *Binary Cross Entropy*. Aquest canvi aprofita l'escala logarítmica per penalitzar severament els errors de contrast, millorant dràsticament la definició de vores anatòmiques complexes (costelles, silueta cardíaca) i la nitidesa de les opacitats.
+  
+* **Optimització per a Mixed Precision (AMP):** Per evitar inestabilitats numèriques i infinits al calcular la BCE en 16-bits, es va eliminar la capa `Sigmoid` final del *Decoder*. Ara el model escup *logits* purs, fusionant l'activació i la pèrdua en una única operació segura (`BCEWithLogitsLoss`).
+  
+* **Validació de Continuïtat (Interpolació Latent):** S'ha dissenyat i executat un experiment d'interpolació lineal a l'espai latent de $4 \times 28 \times 28$. Els resultats demostren una transició fluida i anatòmicament coherent entre el centroide "Sa" i el centroide "Pneumònia", descartant l'existència de zones mortes o col·lapse modal i donant llum verda per a la fase de *Flow Matching*.
+

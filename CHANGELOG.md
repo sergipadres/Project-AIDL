@@ -401,3 +401,15 @@ Proper Pas - Migrar MFM a:
   
 * **Validació de Continuïtat (Interpolació Latent):** S'ha dissenyat i executat un experiment d'interpolació lineal a l'espai latent de $4 \times 28 \times 28$. Els resultats demostren una transició fluida i anatòmicament coherent entre el centroide "Sa" i el centroide "Pneumònia", descartant l'existència de zones mortes o col·lapse modal i donant llum verda per a la fase de *Flow Matching*.
 
+
+## 06/03/2026:  **Versió Final:** `VAE_XRV v11` *(Arquitectura amb decoder de 10 passes i Estabilització)*
+
+* **[Added]** Nova arquitectura de Decoder profund de 10 passes a la classe `SpatialVAE_XRV` per optimitzar la definició de les textures anatòmiques.
+* 
+* **[Changed]** Implementació de disseny "híbrid fraccional" al Decoder: s'han intercalat 3 capes d'escalat (`ConvTranspose2d` amb `stride=2`) amb 7 capes de refinament (`Conv2d` amb `padding=1`). Això permet augmentar la resolució de 28x28 a 224x224 sense patir explosions de memòria espacial a la GPU.
+* 
+* **[Changed]** Entrenament consolidat fins a 96 èpoques (amb *Early Stopping*). Millora significativa de les mètriques: VGG Perceptual Loss reduïda a un mínim de **0.0084** (major nitidesa) i Divergència KL estabilitzada a **2.88** (espai latent òptim).
+* 
+* **[Fixed]** Actualitzat el *pipeline* d'inferència i dibuix de gràfics. S'ha afegit l'aplicació explícita de `torch.sigmoid()` sobre les prediccions del model per visualitzar-les correctament, atès que l'arquitectura final no inclou la capa Sigmoide per mantenir la compatibilitat matemàtica amb `BCEWithLogitsLoss`.
+
+> **Notes de Disseny Estratègic:** Es prioritza mantenir la topologia suau, contínua i sense artefactes de l'espai latent actual. Aquest és un requisit matemàtic indispensable per garantir la convergència de les Equacions Diferencials Ordinàries (ODEs) en el model de *Flow Matching* que s'implementarà a la Fase 2.

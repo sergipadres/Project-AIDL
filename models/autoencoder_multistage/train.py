@@ -76,14 +76,13 @@ loss_fn_FID = FrechetInceptionDistance(feature = 2048,
                                        antialias=True).cuda()
 loss_fn_FID.set_dtype(torch.float64)
 
-optimizer = optim.AdamW(autoencoder_model.parameters(), lr=38e-5)
-optimizer_filepath = "Opt-BCE-VGG-98-epoch054"
-optimizer.load_state_dict(torch.load(optimizer_filepath))
-#for param_group in optimizer.param_groups: param_group['lr'] = 16e-5
+optimizer = optim.AdamW(autoencoder_model.parameters(), lr=12e-4)
+#optimizer_filepath = "Opt-BCE-VGG-98-epoch054"
+#optimizer.load_state_dict(torch.load(optimizer_filepath))
 
 
 #lr_scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=10, eta_min=3e-4)
-lr_scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.65, patience=4, threshold=1, threshold_mode='abs', cooldown=2, min_lr=1e-7, eps=1e-08)
+lr_scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.65, patience=4, threshold=1, threshold_mode='abs', cooldown=2, min_lr=1e-6, eps=1e-08)
 class EarlyStopping:
     def __init__(self, patience=20, min_delta=0.01):
         self.patience = patience
@@ -108,20 +107,19 @@ class EarlyStopping:
 
 
 early_stopping = EarlyStopping()
-warmup = 10
 num_epochs = 100
 epoch_loss_Pixel = []
 if use_vgg: epoch_loss_VGG = []
 validation_epoch_loss = []
 
 
-epoch_loss_Pixel = np.load("epoch_loss_pixel-epoch54.npy")
-epoch_loss_VGG = np.load("epoch_loss_VGG-epoch54.npy")
-validation_epoch_loss = np.load("validation_epoch_loss-epoch54.npy")
+#epoch_loss_Pixel = np.load("epoch_loss_pixel-epoch54.npy")
+#epoch_loss_VGG = np.load("epoch_loss_VGG-epoch54.npy")
+#validation_epoch_loss = np.load("validation_epoch_loss-epoch54.npy")
 
 
 
-start_epoch = 55
+start_epoch = 1
 epoch_loop = tqdm(range(start_epoch, num_epochs), total = num_epochs - start_epoch + 1)
 for epoch in epoch_loop:
     autoencoder_model.train()
@@ -215,7 +213,7 @@ for epoch in epoch_loop:
         torch.save(optimizer.state_dict(), f"./Opt-{pixel_loss_tag}-{tag}-98-epoch{epoch:03}")
 
         np.save(f"epoch_loss_pixel-epoch{epoch}", epoch_loss_Pixel)
-        np.save(f"epoch_loss_VGG-epoch{epoch}", epoch_loss_VGG)
+        if use_vgg: np.save(f"epoch_loss_VGG-epoch{epoch}", epoch_loss_VGG)
         np.save(f"validation_epoch_loss-epoch{epoch}", validation_epoch_loss)
 
 
@@ -240,5 +238,8 @@ for epoch in epoch_loop:
     if early_stopping.early_stop:
         print(" Early Stopping..")
         torch.save(autoencoder_model.state_dict(), f"./VIT-{pixel_loss_tag}-{tag}-98-epoch{epoch:03}")
-        torch.save(optimizer.state_dict(), f"./VIT-{pixel_loss_tag}-{tag}-98-epoch{epoch:03}")
+        torch.save(optimizer.state_dict(), f"./Opt-{pixel_loss_tag}-{tag}-98-epoch{epoch:03}")
+        np.save(f"epoch_loss_pixel-epoch{epoch}", epoch_loss_Pixel)
+        if use_vgg: np.save(f"epoch_loss_VGG-epoch{epoch}", epoch_loss_VGG)
+        np.save(f"validation_epoch_loss-epoch{epoch}", validation_epoch_loss)
         break

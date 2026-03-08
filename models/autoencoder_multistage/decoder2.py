@@ -148,4 +148,4 @@ class Decoder(nn.Module):
         for block in self.blocks_upscale:
             f_maps = block(f_maps)
 
-        return f_maps
+        return torch.clamp(f_maps,0,1)

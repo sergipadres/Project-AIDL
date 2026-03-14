@@ -69,6 +69,15 @@ This project is structured around two main phases. We evaluate our pipeline from
 
 *(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `development/` folder).*
 
+#### Experiment 4: Metric-Regularized Flow Matching with Spatial Vector Fields
+* **Hypothesis:** Incorporating an explicit learned latent metric together with a gamma-corrected interpolation path will stabilize Flow Matching training and prevent trajectories from leaving the data manifold. When combined with a spatial vector field (U-Net) operating directly on spatial latents, the resulting RK4 trajectories should generate smooth, anatomically consistent disease progressions with minimal off-manifold artifacts.
+* **Setup (Dataset & Model):** We use PneumoniaMNIST, which contains chest X-ray images labeled as healthy or pneumonia. Images are encoded into latent representations using a pretrained autoencoder. Two latent representations are studied:
+* Flat latents: 1. Shape: (98), 2. Produced by a ViT-based masked autoencoder, 3. Used with a vector field.
+* Spatial latents: 1. Shape: (4 × 28 × 28), 2. Preserve spatial structure, 3. Used with a U-Net vector field
+* **Results:** (completar)
+* 1. RK4 integration produces smoother progressions than Euler.
+* **Conclusions:**
+*(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `development/` folder).*
 ---
 
 ## 3. Repository Structure

@@ -43,7 +43,7 @@ This project is structured around two main phases. We evaluate our pipeline from
   * *Structural Fidelity (SSIM):* Spatial VAE achieved **0.88**, vastly outperforming the ViT (**0.62**).
 * **Conclusions:** Spatial VAEs provide the optimal, unobstructed continuous path required for downstream Flow Matching, successfully preserving the anatomical proportions of the thoracic cavity.
 
-`![PCA Latent Projections](https://github.com/sergipadres/Project-AIDL/blob/main/assets/2D_PCA_Projection_Latent_Spaces.png)`
+`![PCA Latent Projections](https://github.com/sergipadres/Project-AIDL/main/assets/2D_PCA_Projection_Latent_Spaces.png)`
 
 **Sanity check:** We also ran an “overfit one image” experiment (single sample, no masking) to verify that the autoencoder and training loop can learn a near-perfect reconstruction and confirm the autoencoder works as intended.
 
@@ -63,7 +63,7 @@ This project is structured around two main phases. We evaluate our pipeline from
   * *Spatial VAE Latent Flow:* The model successfully navigated the continuous manifold. The interpolations smoothly injected pathological features (opacity) without destroying the structural integrity of the ribs and lungs.
 * **Conclusions:** Latent-space Flow Matching paired with spatial regularization (Spatial VAE) is a vastly superior framework for modeling disease progression in medical imaging, combining computational efficiency with high generative fidelity.
 
- `![Flow Matching Trajectories](https://github.com/sergipadres/Project-AIDL/blob/main/assets/experiment3_trajectories_images.png)`
+ `![Flow Matching Trajectories](https://github.com/sergipadres/Project-AIDL/main/assets/experiment3_trajectories_images.png)`
 
 *(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `notebooks/development/` folder).*
 

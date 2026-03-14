@@ -74,17 +74,18 @@ This project is structured around two main phases. We evaluate our pipeline from
 ## 3. Repository Structure
 
 ```text
-pneumonia-flow-matching/
-├── assets/                     # Final data and visual resources
-│   └── images/                 # PCA plots and reconstructions for the README
+Project-AIDL/
+├── assets/                     # Final data and visual resources PCA plots and reconstructions for the README
+│   ├── development images/     # Intermediate plots, and training progress visuals
+│   └── latent_files/           # Extracted latent representations (tensors) from the VAE/ViT
 ├── checkpoints/                # EMPTY FOLDER (Place downloaded .pth weights here)
 ├── models/                     # Python scripts (Architectures and Functions)
 │   ├── autoencoders/           
-│   └── flow_matching/          
+│   └── flow_matching/
+├── development/                # Previous versions, deprecated tests, and sanity checks          
 ├── notebooks/                  # Jupyter Notebooks
-│   ├── development/            # Previous versions, deprecated tests, and sanity checks
 │   ├── training/               # Training loops for VAE and Flow Matching
-│   └── experiments/            # Final pipeline experiments (Exp 1, 2, 3 and 4)     
+│   └── experiments/            # Final pipeline experiments (Exp 1, 2, 3 and 4) + sanity checks   
 ├── CHANGELOG.md                # Log of versions, trials, and model surgery
 ├── requirements.txt            # Python dependencies
 └── README.md                   # Summary and instructions

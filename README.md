@@ -67,7 +67,7 @@ This project is structured around two main phases. We evaluate our pipeline from
 
  ![Flow Matching Trajectories](./assets/experiment_3_trajectories_images.png)
 
-*(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `notebooks/development/` folder).*
+*(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `development/` folder).*
 
 ---
 

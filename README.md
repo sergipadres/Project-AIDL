@@ -58,13 +58,13 @@ This project is structured around two main phases. We evaluate our pipeline from
 * **Results:** While the model learned the general direction of the disease progression, pixel-level integration proved to be computationally heavy. The trajectories often introduced blurring and structural artifacts due to the high dimensionality of the image space.
 * **Conclusions:** Pixel-space Flow Matching is inefficient and prone to generating anatomically inconsistent images. Dimensionality reduction is strictly required.
 
-#### Experiment 3: Latent Space Flow Matching (The Proposed Pipeline)  
-* **Hypothesis:** Executing the Flow Matching ODE/RK4 solver over the optimally regularized latents of the Spatial VAE will eliminate OOD artifacts and generate highly realistic, continuous interpolations of disease progression.
-* **Setup (Dataset & Model):** A Vector Field MLP/FlowCNN was trained on the extracted latents of both the Spatial VAE and the ViT (for ablation). During inference, we used an Euler ODE solver to push healthy latents towards the pathological distribution, decoding the final steps back to image space.
-* **Results:** * *ViT Latent Flow:* The vector field struggled with the collapsed topology, resulting in noisy trajectories.
-  * *Spatial VAE Latent Flow:* The model successfully navigated the continuous manifold. The interpolations smoothly injected pathological features (opacity) without destroying the structural integrity of the ribs and lungs.
-* **Conclusions:** Latent-space Flow Matching paired with spatial regularization (Spatial VAE) is a vastly superior framework for modeling disease progression in medical imaging, combining computational efficiency with high generative fidelity.
-
+#### Experiment 3: Latent Space Flow Matching
+* **Objective:** Accelerate the Flow Matching training process by operating in a lower-dimensional latent space, comparing the representations of the Spatial VAE and the ViT.
+* **Hypothesis:** Executing Flow Matching in a compressed latent space will drastically reduce computational costs compared to pixel-space integration (Experiment 1), although some generative accuracy in the trajectories might be compromised.
+* **Setup (Dataset & Model):** A Vector Field MLP/FlowCNN was trained on the extracted latents of both the Spatial VAE and the ViT. During inference, we used an ODE solver to push healthy latents towards the pathological distribution, decoding the final steps back to image space. We additionally integrated a DINO model for validation to track the evolution of disease features.
+* **Results:** Latent-space integration reduced the vector field training time by an order of magnitude (from ~20 minutes in pixel space to 2-3 minutes). The generated trajectories and DINO validation confirmed that the flow successfully pushed healthy images towards the sick distribution. However, visual fidelity suffered compared to Experiment 1.
+* **Conclusions:** While Latent-space Flow Matching is vastly superior in computational efficiency, the standard Euclidean vector field learned over the VAE's latent space is not perfectly capable of flawless trajectory generation. This indicates that the latent manifold geometry requires a non-linear approach, setting the stage for Riemannian Flow Matching in the next experiment.
+  
  ![Flow Matching Trajectories](./assets/experiment_3_trajectories_images.png)
 
 *(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `development/` folder).*

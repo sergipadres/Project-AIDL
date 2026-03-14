@@ -79,10 +79,10 @@ Project-AIDL/
 │   ├── development images/     # Intermediate plots, and training progress visuals
 │   └── latent_files/           # Extracted latent representations (tensors) from the VAE/ViT
 ├── checkpoints/                # EMPTY FOLDER (Place downloaded .pth weights here)
+├── development/                # Previous versions, deprecated tests, and sanity checks  
 ├── models/                     # Python scripts (Architectures and Functions)
 │   ├── autoencoders/           
-│   └── flow_matching/
-├── development/                # Previous versions, deprecated tests, and sanity checks          
+│   └── flow_matching/        
 ├── notebooks/                  # Jupyter Notebooks
 │   ├── training/               # Training loops for VAE and Flow Matching
 │   └── experiments/            # Final pipeline experiments (Exp 1, 2, 3 and 4) + sanity checks   

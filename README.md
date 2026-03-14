@@ -65,7 +65,7 @@ This project is structured around two main phases. We evaluate our pipeline from
 * **Results:** Latent-space integration reduced the vector field training time by an order of magnitude (from ~20 minutes in pixel space to 2-3 minutes). The generated trajectories and DINO validation confirmed that the flow successfully pushed healthy images towards the sick distribution. However, visual fidelity suffered compared to Experiment 1.
 * **Conclusions:** While Latent-space Flow Matching is vastly superior in computational efficiency, the standard Euclidean vector field learned over the VAE's latent space is not perfectly capable of flawless trajectory generation. This indicates that the latent manifold geometry requires a non-linear approach, setting the stage for Riemannian Flow Matching in the next experiment.
   
- ![Flow Matching Trajectories](./assets/experiment_3_trajectories_images.png)
+ ![Flow Matching Trajectories](./assets/experiment3_trajectories_256.png)
 
 *(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `development/` folder).*
 

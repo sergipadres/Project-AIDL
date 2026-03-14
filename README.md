@@ -24,12 +24,13 @@ Project advisor:
 
 **The Pipeline:** Image → Encode to latent space → Flow Matching in latent space → Decode to pathological image.
 
-Conditional Flow Matching (CFM) is a deep generative model framework that allows for generating samples from one distribution given samples from another, learning a mapping between both distributions parameterized by a vector field. It provides a simulation-free learning step, improving training efficiency over diffusion models. Our main hypothesis is that CFM is an optimal approach to learn trajectories from a healthy distribution to a sick distribution in the medical imaging domain, specifically utilizing [**PneumoniaMNIST**](https://medmnist.com/) (pediatric chest X-rays), it contains 5,856 pediatric chest X-Ray images. And we used 224x224 images.
+Conditional Flow Matching (CFM) is a deep generative model framework that allows for generating samples from one distribution given samples from another, learning a mapping between both distributions parameterized by a vector field. It provides a simulation-free learning step, improving training efficiency over diffusion models.
+
+Our main hypothesis is that CFM is an optimal approach to learn trajectories from a healthy distribution to a sick distribution in the medical imaging domain, specifically utilizing [**PneumoniaMNIST**](https://medmnist.com/) (pediatric chest X-rays), it contains 5,856 pediatric chest X-Ray images. And we used 224x224 images.
 
 We address the high computational cost and artifact generation typical of pixel-space integration by projecting the data into a continuous, regularized latent space.
 
 ---
-
 
 ##  2. Experiments & Key Results
 

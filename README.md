@@ -58,7 +58,7 @@ This project is structured around two main phases. We evaluate our pipeline from
 * **Results:** While the model learned the general direction of the disease progression, pixel-level integration proved to be computationally heavy. The trajectories often introduced blurring and structural artifacts due to the high dimensionality of the image space.
 * **Conclusions:** Pixel-space Flow Matching is inefficient and prone to generating anatomically inconsistent images. Dimensionality reduction is strictly required.
 
-#### Experiment 3: Latent Space Flow Matching (The Proposed Pipeline)
+#### Experiment 3: Latent Space Flow Matching (The Proposed Pipeline)  
 * **Hypothesis:** Executing the Flow Matching ODE/RK4 solver over the optimally regularized latents of the Spatial VAE will eliminate OOD artifacts and generate highly realistic, continuous interpolations of disease progression.
 * **Setup (Dataset & Model):** A Vector Field MLP/FlowCNN was trained on the extracted latents of both the Spatial VAE and the ViT (for ablation). During inference, we used an Euler ODE solver to push healthy latents towards the pathological distribution, decoding the final steps back to image space.
 * **Results:** * *ViT Latent Flow:* The vector field struggled with the collapsed grid-like topology, resulting in noisy, inconsistent trajectories.

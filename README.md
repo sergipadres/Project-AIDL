@@ -109,13 +109,13 @@ pip install -r requirements.txt
 ## 5. Model Weights & Local Setup (Important)
 Due to GitHub's file size limits, the pre-trained weights (.pth files) for the Spatial VAE and Flow Matching models are hosted externally. To run the evaluation notebooks without training from scratch:
 
-Download the pre-trained weights from this Google Drive link: [INSERT_DRIVE_LINK_HERE].
+Download the pre-trained weights from this Google Drive link: [DRIVE_LINK_HERE].
 
 Place the downloaded .pth files inside the checkpoints/ folder of this repository.
 
 --- 
 ## 6. How to Run
 
-Phase 1 (Latent Space Validation): Open notebooks/evaluation/experiment-2-multistage-vs-spatialvae.ipynb to reproduce the latent space topology analysis (PCA) and reconstruction metrics.
+Phase 1 (Latent Space Validation): Open notebooks/experiments/experiment-2-multistage-vs-spatialvae.ipynb to reproduce the latent space topology analysis (PCA) and reconstruction metrics.
 
-Phase 2 (Flow Matching Interpolation): Open notebooks/evaluation/experiment3.ipynb to visualize the continuous translation from healthy to pneumonia using the ODE solver in latent space.
+Phase 2 (Flow Matching Interpolation): Open notebooks/experiments/experiment3.ipynb to visualize the continuous translation from healthy to pneumonia using the ODE solver in latent space.

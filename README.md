@@ -64,7 +64,7 @@ This project is structured around two main phases. We evaluate our pipeline from
   * *Spatial VAE Latent Flow:* The model successfully navigated the continuous manifold. The interpolations smoothly injected pathological features (opacity) without destroying the structural integrity of the ribs and lungs.
 * **Conclusions:** Latent-space Flow Matching paired with spatial regularization (Spatial VAE) is a vastly superior framework for modeling disease progression in medical imaging, combining computational efficiency with high generative fidelity.
 
- `![Flow Matching Trajectories](https://github.com/sergipadres/Project-AIDL/main/assets/experiment3_trajectories_images.png)`
+ `![Flow Matching Trajectories](./assets/experiment3_trajectories_images.png)`
 
 *(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `notebooks/development/` folder).*
 

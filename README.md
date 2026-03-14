@@ -116,6 +116,6 @@ Place the downloaded .pth files inside the checkpoints/ folder of this repositor
 --- 
 ## 6. How to Run
 
-Phase 1 (Latent Space Validation): Open notebooks/experiments/experiment-2-multistage-vs-spatialvae.ipynb to reproduce the latent space topology analysis (PCA) and reconstruction metrics.
+Phase 1 (Latent Space Validation): Open notebooks/experiments/experiment-2/experiment-2-multistage-vs-spatialvae.ipynb to reproduce the latent space topology analysis (PCA) and reconstruction metrics.
 
 Phase 2 (Flow Matching Interpolation): Open notebooks/experiments/experiment3.ipynb to visualize the continuous translation from healthy to pneumonia using the ODE solver in latent space.

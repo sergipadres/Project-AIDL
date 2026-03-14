@@ -77,7 +77,7 @@ This project is structured around two main phases. We evaluate our pipeline from
 * **Results:** (completar)
 * 1. RK4 integration produces smoother progressions than Euler.
 * **Conclusions:**
-*(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `development/` folder).*
+
 ---
 
 ## 3. Repository Structure

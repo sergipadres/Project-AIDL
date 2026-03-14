@@ -43,7 +43,8 @@ This project is structured around two main phases. We evaluate our pipeline from
   * *Structural Fidelity (SSIM):* Spatial VAE achieved **0.88**, vastly outperforming the ViT (**0.62**).
 * **Conclusions:** Spatial VAEs provide the optimal, unobstructed continuous path required for downstream Flow Matching, successfully preserving the anatomical proportions of the thoracic cavity.
 
-`![PCA Latent Projections](https://github.com/sergipadres/Project-AIDL/main/assets/2D_PCA_Projection_Latent_Spaces.png)`
+
+![PCA Latent Projections](./assets/2D_PCA_Projection_Latent_Spaces.png)
 
 **Sanity check:** We also ran an “overfit one image” experiment (single sample, no masking) to verify that the autoencoder and training loop can learn a near-perfect reconstruction and confirm the autoencoder works as intended.
 

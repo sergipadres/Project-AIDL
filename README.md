@@ -97,8 +97,8 @@ Project-AIDL/
 
 * Clone this repository:
 
-git clone [https://github.com/](https://github.com/)[USER_NAME]/[REPO-NAME].git
-cd [REPO-NAME]
+git clone [https://github.com/](https://github.com/)[sergipadres]/[Project-AIDL].git 
+cd [Project-AIDL]
 
 * Install dependencies:
 

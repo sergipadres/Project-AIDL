@@ -43,8 +43,7 @@ This project is structured around two main phases. We evaluate our pipeline from
   * *Structural Fidelity (SSIM):* Spatial VAE achieved **0.88**, vastly outperforming the ViT (**0.62**).
 * **Conclusions:** Spatial VAEs provide the optimal, unobstructed continuous path required for downstream Flow Matching, successfully preserving the anatomical proportions of the thoracic cavity.
 
-> *[Insert PCA Latent Space visualization here]*
-> `![PCA Latent Projections](https://github.com/sergipadres/Project-AIDL/blob/main/assets/images/pca_latent_colored.png)`
+`![PCA Latent Projections](https://github.com/sergipadres/Project-AIDL/blob/main/assets/2D_PCA_Projection_Latent_Spaces.png)`
 
 **Sanity check:** We also ran an “overfit one image” experiment (single sample, no masking) to verify that the autoencoder and training loop can learn a near-perfect reconstruction and confirm the autoencoder works as intended.
 
@@ -64,8 +63,7 @@ This project is structured around two main phases. We evaluate our pipeline from
   * *Spatial VAE Latent Flow:* The model successfully navigated the continuous manifold. The interpolations smoothly injected pathological features (opacity) without destroying the structural integrity of the ribs and lungs.
 * **Conclusions:** Latent-space Flow Matching paired with spatial regularization (Spatial VAE) is a vastly superior framework for modeling disease progression in medical imaging, combining computational efficiency with high generative fidelity.
 
-> *[Insert VAE Flow Matching Trajectories / Interpolation here]*
-> `![Flow Matching Trajectories](https://github.com/sergipadres/Project-AIDL/blob/main/assets/images/experiment3_trajectories.png)`
+ `![Flow Matching Trajectories](https://github.com/sergipadres/Project-AIDL/blob/main/assets/experiment3_trajectories_images.png)`
 
 *(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `notebooks/development/` folder).*
 
@@ -89,9 +87,10 @@ pneumonia-flow-matching/
 ├── requirements.txt            # Python dependencies
 └── README.md                   # Summary and instructions
 
+```
+---
 
-
-4. Installation
+## 4. Installation
 
 * Clone this repository:
 
@@ -102,15 +101,17 @@ cd [REPO-NAME]
 
 pip install -r requirements.txt
 
+---
 
-5. Model Weights & Local Setup (Important)
+## 5. Model Weights & Local Setup (Important)
 Due to GitHub's file size limits, the pre-trained weights (.pth files) for the Spatial VAE and Flow Matching models are hosted externally. To run the evaluation notebooks without training from scratch:
 
 Download the pre-trained weights from this Google Drive link: [INSERT_DRIVE_LINK_HERE].
 
 Place the downloaded .pth files inside the checkpoints/ folder of this repository.
 
-6. How to Run
+--- 
+## 6. How to Run
 
 Phase 1 (Latent Space Validation): Open notebooks/evaluation/experiment-2-multistage-vs-spatialvae.ipynb to reproduce the latent space topology analysis (PCA) and reconstruction metrics.
 

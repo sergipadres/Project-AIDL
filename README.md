@@ -78,9 +78,13 @@ This project is structured around two main phases. We evaluate our pipeline from
 * **Results:** (completar)
 * 1. RK4 integration produces smoother progressions than Euler.
 * **Conclusions:**
+* In flat latent mode, Metric-Regularized Flow Matching produced generated trajectories whose decoded images showed a clear transition from healthy-like to pneumonia-like appearance. This was validated quantitatively using an external image classifier.
 
 ![Metric Flow Matching Trajectories](./assets/experiment4_flat_256dim_RK4.png)
 
+Validation with a classification model (DINO) shows that, at the start, the probability of pneumonia is low, then increases in the middle of the trajectory, and ends at a high probability near **𝑡** = 1. This is exactly the kind of behavior we want from a disease-progression trajectory.
+
+![Experiment 4 validation](./assets/exp_4_validation.png)
 
 
 ---

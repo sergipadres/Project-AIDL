@@ -79,6 +79,10 @@ This project is structured around two main phases. We evaluate our pipeline from
 * 1. RK4 integration produces smoother progressions than Euler.
 * **Conclusions:**
 
+![Metric Flow Matching Trajectories](./assets/experiment4_flat_256dim_RK4.png)
+
+
+
 ---
 
 ## 3. Repository Structure

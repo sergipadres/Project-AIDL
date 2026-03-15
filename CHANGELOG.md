@@ -401,6 +401,20 @@ Proper Pas - Migrar MFM a:
   
 * **Validació de Continuïtat (Interpolació Latent):** S'ha dissenyat i executat un experiment d'interpolació lineal a l'espai latent de $4 \times 28 \times 28$. Els resultats demostren una transició fluida i anatòmicament coherent entre el centroide "Sa" i el centroide "Pneumònia", descartant l'existència de zones mortes o col·lapse modal i donant llum verda per a la fase de *Flow Matching*.
 
+## 03/03/2026: Entenament MFM amb flat i spatial latents
+
+Crear el fitxer:
+v4_training_MFM_flat_and_spatial_unet_03032026
+
+Afegir la variable MODE per controlar si és flat o spatial. Afegir la part de spatial latents (4x28x28) i adaptant el vector field perque usi una U-Net.
+
+He agafat la idea de la mini U-net, pero adaptat, he reduit la profunditat, fer 4 o 5 downsamples era excessiu i acabava col·lapsant massa la resolució espacial, n’he deixat 2. Agrupar les convolucions en blocs residuals(ResBlock) i afegir condicionament temporal.
+
+In the PneumoniaMNIST, the learned spatial latent space appears sufficiently smooth that straight healthy-to-sick interpolations are already assigned similar manifold scores to real data. As a result, the Gamma correction network receives only a weak signal and produces minimal curvature. This suggests that, in this simplified setting, the main benefit comes from the spatial vector field itself, while metric-based geodesic correction may only become useful in more complex latent geometries or richer clinical datasets.
+
+També fent proves hem vist que RK4 és millor pels resultats a nivell numèric a la part del vector field après, que no pas el ODE.
+
+Al no ser endpoint conditioned, els resultats van d’un sà, cap a un malalt qualsevol, però la image final també està generada, no és un malalt existent. I s’ha observat en primer lloc que els resultats de flat vector semblen ser millors.
 
 ## 06/03/2026:  **Versió Final:** `VAE_XRV v11` *(Arquitectura amb decoder de 10 passes i Estabilització)*
 
@@ -413,4 +427,3 @@ Proper Pas - Migrar MFM a:
 * **[Fixed]** Actualitzat el *pipeline* d'inferència i dibuix de gràfics. S'ha afegit l'aplicació explícita de `torch.sigmoid()` sobre les prediccions del model per visualitzar-les correctament, atès que l'arquitectura final no inclou la capa Sigmoide per mantenir la compatibilitat matemàtica amb `BCEWithLogitsLoss`.
 
 > **Notes de Disseny Estratègic:** Es prioritza mantenir la topologia suau, contínua i sense artefactes de l'espai latent actual. Aquest és un requisit matemàtic indispensable per garantir la convergència de les Equacions Diferencials Ordinàries (ODEs) en el model de *Flow Matching* que s'implementarà a la Fase 2.
-

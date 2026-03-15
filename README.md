@@ -1,6 +1,7 @@
 # Flow Matching for Disease Progression in Medical Imaging
 ### Project-AIDL - Final project for the Postgraduate program Artificial Intelligence with Deep Learning 2025–2026, UPC Barcelona
 
+![Cover image](./assets/cover_image.png)
 
 ## Authors
 - Arnau Claramunt
@@ -72,7 +73,7 @@ This project is structured around two main phases. We evaluate our pipeline from
 #### Experiment 4: Metric-Regularized Flow Matching with Spatial Vector Fields
 * **Hypothesis:** Incorporating an explicit learned latent metric together with a gamma-corrected interpolation path will stabilize Flow Matching training and prevent trajectories from leaving the data manifold. When combined with a spatial vector field (U-Net) operating directly on spatial latents, the resulting RK4 trajectories should generate smooth, anatomically consistent disease progressions with minimal off-manifold artifacts.
 * **Setup (Dataset & Model):** We use PneumoniaMNIST, which contains chest X-ray images labeled as healthy or pneumonia. Images are encoded into latent representations using a pretrained autoencoder. Two latent representations are studied:
-* Flat latents: 1. Shape: (98), 2. Produced by a ViT-based masked autoencoder, 3. Used with a vector field.
+* Flat latents: 1. Shape: (256), 2. Produced by a ViT-based masked autoencoder, 3. Used with a vector field.
 * Spatial latents: 1. Shape: (4 × 28 × 28), 2. Preserve spatial structure, 3. Used with a U-Net vector field
 * **Results:** (completar)
 * 1. RK4 integration produces smoother progressions than Euler.
@@ -127,4 +128,11 @@ Place the downloaded .pth files inside the checkpoints/ folder of this repositor
 
 Phase 1 (Latent Space Validation): Open notebooks/experiments/experiment-2/experiment-2-multistage-vs-spatialvae.ipynb to reproduce the latent space topology analysis (PCA) and reconstruction metrics.
 
-Phase 2 (Flow Matching Interpolation): Open notebooks/experiments/experiment3.ipynb to visualize the continuous translation from healthy to pneumonia using the ODE solver in latent space.
+Phase 2 (Flow Matching Interpolation): Open notebooks/experiments/experiment3.ipynb to visualize the continuous translation from healthy to pneumonia using the ODE solver in latent space. 
+(Visualize Metric Flow Matching): Open notebooks/experiments/experiment-4-MFM.ipynb to visualize the trajectories from healty to pneumonia, using a correction metric and evaluating the results with a classifier.
+
+
+<br>
+
+> [!WARNING]  
+> Disclaimer: This repository is research/educational work. Generated images are not intended for clinical use.

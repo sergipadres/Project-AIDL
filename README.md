@@ -53,11 +53,12 @@ This project is structured around two main phases. We evaluate our pipeline from
 ---
 
 ### Phase 2: Flow Matching Integration
+
 #### Experiment 1: Baseline Conditional Flow Matching (Pixel Space)
-* **Hypothesis:** Conditional Flow Matching (CFM) can successfully learn a vector field that maps a healthy X-ray distribution to a pneumonia-infected distribution.
-* **Setup (Dataset & Model):** CFM integration applied directly on the pixel space of the PneumoniaMNIST dataset using a standard neural ODE formulation.
-* **Results:** While the model learned the general direction of the disease progression, pixel-level integration proved to be computationally heavy. The trajectories often introduced blurring and structural artifacts due to the high dimensionality of the image space.
-* **Conclusions:** Pixel-space Flow Matching is inefficient and prone to generating anatomically inconsistent images. Dimensionality reduction is strictly required.
+* **Hypothesis:** Conditional Flow Matching (CFM) can successfully learn a vector field that maps a healthy X-ray distribution to a pneumonia-infected distribution in the medical image domain.
+* **Setup (Dataset & Model):** CFM integration applied directly on the pixel space of the PneumoniaMNIST dataset (images scaled to 224x224). We trained a vector field parameterized by a Vision Transformer conditioned on the timestep, randomly sampling from both sick and healthy distributions.
+* **Results:** The model successfully learned the vector field dynamics. During inference, Euler integration generated continuous trajectories that pushed healthy origin images towards the pathological distribution. A quantitative evaluation using a classifier confirmed that the probability of pneumonia increased progressively and consistently at each timestep of the trajectory.
+* **Conclusions:** We consider this a highly successful baseline experiment. It proves that Conditional Flow Matching is an appropriate and effective approach to modeling disease progression trajectories in medical imaging, validated both by direct visual inspection and quantitative classifier scores.
 
 #### Experiment 3: Latent Space Flow Matching
 * **Objective:** Accelerate the Flow Matching training process by operating in a lower-dimensional latent space, comparing the representations of the Spatial VAE and the ViT.

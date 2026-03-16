@@ -82,9 +82,8 @@ This project is structured around two main phases. We evaluate our pipeline from
   In flat latent mode, the learned metric provides a meaningful manifold-aware signal. Corrected paths achieve lower metric cost than straight linear interpolations, indicating that Gamma bends trajectories toward more plausible latent regions. In spatial latent mode, the effect is weaker: the learned spatial latent space is already smooth enough that straight healthy-to-sick interpolations receive manifold scores similar to real data. As a result, Gamma gets only a weak correction signal and introduces little curvature. In this setting, most of the benefit appears to come from the spatial vector field itself, while metric-based correction may become more useful in richer clinical datasets. Future work will explore alternative metric formulations and stronger Gamma architectures, including U-Net-based variants.
 
   The metric is defined through a score $h(z)$, which measures how close a latent point is to the learned data manifold, and a penalty:
-  $$
-  M(z) = \frac{1}{(h(z) + \rho)^\alpha}.
-  $$
+  
+  $M(z) = \frac{1}{(h(z) + \rho)^\alpha}.$
 
   High $h(z)$ means the point is more on-manifold. In this sense, the method is Riemannian-like: it uses a learned conformal weighting over latent space to penalize unrealistic regions. The Gamma value the correction term that bends straight interpolation into a better path under this metric. The learned vector field then captures this corrected flow, producing integrated trajectories that remain stable, improve under the metric, and decode into smooth, anatomically coherent images without obvious collapse.
 

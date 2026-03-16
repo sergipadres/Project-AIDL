@@ -13,7 +13,7 @@ Incorporating an **explicit learned latent metric** together with a **gamma-corr
 
 ## Training Workflow
 To achieve a stable flow, the training process is decoupled into sequential stages:
-1. **Metric Training:** First, we learn the latent metric to define distances on the manifold.
+1. **Metric Training:** First, we learn a latent-space metric that assigns lower penalty to points closer to the learned data manifold.
 2. **Gamma Calibration:** Using the learned metric, we compute the gamma-corrected interpolation path.
 3. **Vector Field Training:** Finally, we train the vector field $v(z, t)$ using both the metric and the gamma-corrected path.
 4. **Inference:** We use the trained Autoencoder to map images to latents, apply the metric-regularized vector field to guide transitions, and solve the ODE via **RK4** to visualize anatomically consistent intermediate steps.

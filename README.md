@@ -70,15 +70,29 @@ This project is structured around two main phases. We evaluate our pipeline from
 
 *(Note: For a detailed log of intermediate versions, failed approaches, and early testing—such as our ViT MAE tests—please refer to the `CHANGELOG.md` file and the `development/` folder).*
 
-#### Experiment 4: Metric-Regularized Flow Matching with Spatial Vector Fields
+#### Experiment 4: Metric-Regularized Flow Matching with Flat and Spatial Vector Fields
 * **Hypothesis:** Incorporating an explicit learned latent metric together with a gamma-corrected interpolation path will stabilize Flow Matching training and prevent trajectories from leaving the data manifold. When combined with a spatial vector field (U-Net) operating directly on spatial latents, the resulting RK4 trajectories should generate smooth, anatomically consistent disease progressions with minimal off-manifold artifacts.
 * **Setup (Dataset & Model):** We use PneumoniaMNIST, which contains chest X-ray images labeled as healthy or pneumonia. Images are encoded into latent representations using a pretrained autoencoder. Two latent representations are studied:
-* Flat latents: 1. Shape: (256), 2. Produced by a ViT-based masked autoencoder, 3. Used with a vector field.
-* Spatial latents: 1. Shape: (4 × 28 × 28), 2. Preserve spatial structure, 3. Used with a U-Net vector field
-* **Results:** (completar)
-* 1. RK4 integration produces smoother progressions than Euler.
-* **Conclusions:**
-* In flat latent mode, Metric-Regularized Flow Matching produced generated trajectories whose decoded images showed a clear transition from healthy-like to pneumonia-like appearance. This was validated quantitatively using an external image classifier.
+* Flat latents: Shape: (256), produced by a ViT-based masked autoencoder and used to train an MLP-based vector field.
+* Spatial latents: Shape: (4 × 28 × 28), they preserve spatial structure and used with a U-Net vector field
+* **Results:**
+* Once the vector field is trained, the decoded Euler and RK4 trajectories starting from a healthy image and evolving through multiple steps toward pneumonia appear smooth, anatomically coherent, and free of obvious collapse or severe visual artifacts.
+* **Conclusions:** We use a learned latent-space manifold penalty inspired by Riemannian geometry.
+
+  In flat latent mode, the learned metric provides a meaningful manifold-aware signal. Corrected paths achieve lower metric cost than straight linear interpolations, indicating that Gamma bends trajectories toward more plausible latent regions. In spatial latent mode, the effect is weaker: the learned spatial latent space is already smooth enough that straight healthy-to-sick interpolations receive manifold scores similar to real data. As a result, Gamma gets only a weak correction signal and introduces little curvature. In this setting, most of the benefit appears to come from the spatial vector field itself, while metric-based correction may become more useful in richer clinical datasets. Future work will explore alternative metric formulations and stronger Gamma architectures, including U-Net-based variants.
+
+  The metric is defined through a score $h(z)$, which measures how close a latent point is to the learned data manifold, and a penalty:
+  $$
+  M(z) = \frac{1}{(h(z) + \rho)^\alpha}.
+  $$
+
+  High $h(z)$ means the point is more on-manifold. In this sense, the method is Riemannian-like: it uses a learned conformal weighting over latent space to penalize unrealistic regions. The Gamma value the correction term that bends straight interpolation into a better path under this metric. The learned vector field then captures this corrected flow, producing integrated trajectories that remain stable, improve under the metric, and decode into smooth, anatomically coherent images without obvious collapse.
+
+  Quantitatively, a classifier also indicates consistent progression along the trajectory: as samples move toward the more diseased end of the path, the generated images are assigned a higher probability of pneumonia. This suggests that the integrated latent trajectories do not drift into bad latent regions. Instead, they remain reasonably stable throughout integration and, in the flat-latent setting, stay reasonably stable and even improves under the metric.
+
+  Overall, in our last experiment, **Metric Flow Matching** produced better results than Experiment 3, which did not use a metric, and showed that the 256-dimensional flat latent representation performed better than the spatial latent representation.
+
+
 
 ![Metric Flow Matching Trajectories](./assets/experiment4_flat_256dim_RK4.png)
 

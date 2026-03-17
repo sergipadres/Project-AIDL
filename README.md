@@ -35,7 +35,7 @@ We address the high computational cost and artifact generation typical of pixel-
 
 ##  2. Experiments & Key Results
 
-This project is structured around two main phases. We evaluate our pipeline from latent space optimization to the final disease progression synthesis.
+We evaluate our pipeline from latent space optimization to the final disease progression synthesis.
 
 #### Experiment 1: Baseline Conditional Flow Matching (Pixel Space)
 * **Hypothesis:** Conditional Flow Matching (CFM) can successfully learn a vector field that maps a healthy X-ray distribution to a pneumonia-infected distribution in the medical image domain.
@@ -127,12 +127,13 @@ Project-AIDL/
 
 * Clone this repository:
 
-git clone https://github.com/sergipadres/Project-AIDL.git
-cd Project-AIDL
+`git clone https://github.com/sergipadres/Project-AIDL.git`
+
+`cd Project-AIDL`
 
 * Install dependencies:
 
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
 ---
 
@@ -146,16 +147,17 @@ Place the downloaded .pth files inside the checkpoints/ folder of this repositor
 --- 
 ## 6. How to Run
 
-Phase 1 (Latent Space Validation): Open notebooks/experiments/experiment-2/experiment-2-multistage-vs-spatialvae.ipynb to reproduce the latent space topology analysis (PCA) and reconstruction metrics.
+Latent Space Validation: Open `notebooks/experiments/experiment-2/experiment-2-multistage-vs-spatialvae.ipynb` to reproduce the latent space topology analysis (PCA) and reconstruction metrics.
 
 **Note**
-Python scripts for training the autoencoders are provided under models/autoencoders. Training loss and validation history plot is also provided.
+Python scripts for training the autoencoders are provided under `models/autoencoders`. Training loss and validation history plot is also provided.
 An unused variant of the ViT autoencoder (autoencoder_multistage_v2) is also provided. This version uses a ResNext inspired more efficient to train decoder block but was discarded due to lacking reconstruction performance.
 
-Phase 2 (Flow Matching Interpolation): Open notebooks/experiments/experiment3.ipynb to visualize the continuous translation from healthy to pneumonia using the ODE solver in latent space. 
-(Visualize Metric Flow Matching): Open notebooks/experiments/experiment-4-MFM.ipynb to visualize the trajectories from healty to pneumonia, using a correction metric and evaluating the results with a classifier.
+Flow Matching Interpolation: Open `notebooks/experiments/experiment3.ipynb` to visualize the continuous translation from healthy to pneumonia using the ODE solver in latent space. 
+(Visualize Metric Flow Matching): Open `notebooks/experiments/experiment-4-MFM.ipynb` to visualize the trajectories from healty to pneumonia, using a correction metric and evaluating the results with a classifier.
 
 
+<br>
 <br>
 
 > [!WARNING]  

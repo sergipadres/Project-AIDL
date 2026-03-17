@@ -138,7 +138,7 @@ pip install -r requirements.txt
 ---
 
 ## 5. Model Weights & Local Setup (Important)
-Due to GitHub's file size limits, the pre-trained weights (.pth files) for the Spatial VAE and Flow Matching models are hosted externally. To run the evaluation notebooks without training from scratch:
+Due to GitHub's file size limits, the pre-trained weights (.pth files) for the Spatial VAE, ViT Autoencoder, and Flow Matching models are hosted externally. To run the evaluation notebooks without training from scratch:
 
 Download the pre-trained weights from this Google Drive link: [DRIVE_LINK_HERE].
 

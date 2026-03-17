@@ -37,7 +37,12 @@ We address the high computational cost and artifact generation typical of pixel-
 
 This project is structured around two main phases. We evaluate our pipeline from latent space optimization to the final disease progression synthesis.
 
-### Phase 1: Latent Space Topology
+#### Experiment 1: Baseline Conditional Flow Matching (Pixel Space)
+* **Hypothesis:** Conditional Flow Matching (CFM) can successfully learn a vector field that maps a healthy X-ray distribution to a pneumonia-infected distribution in the medical image domain.
+* **Setup (Dataset & Model):** CFM integration applied directly on the pixel space of the PneumoniaMNIST dataset (images scaled to 224x224). We trained a vector field parameterized by a Vision Transformer conditioned on the timestep, randomly sampling from both sick and healthy distributions.
+* **Results:** The model successfully learned the vector field dynamics. During inference, Euler integration generated continuous trajectories that pushed healthy origin images towards the pathological distribution. A quantitative evaluation using a classifier confirmed that the probability of pneumonia increased progressively and consistently at each timestep of the trajectory.
+* **Conclusions:** We consider this a highly successful baseline experiment. It proves that Conditional Flow Matching is an appropriate and effective approach to modeling disease progression trajectories in medical imaging, validated both by direct visual inspection and quantitative classifier scores.
+
 #### Experiment 2: Spatial VAE vs. Unregularized ViT
 * **Hypothesis:** Retaining spatial feature maps via a regularized Convolutional VAE enforcing a $\mathcal{N}(0, I)$ prior yields a denser, more continuous latent topology compared to 1D sequence tokenization (ViT), preventing Out-of-Distribution (OOD) querying during generative sampling.
 * **Setup (Dataset & Model):** PneumoniaMNIST (pediatric chest X-rays, 224x224). We compared a Custom Spatial VAE (utilizing `XRV-ResNetAE-101-elastic` as the encoder) against a Multistage Masked Vision Transformer (ViT) Autoencoder.
@@ -52,13 +57,7 @@ This project is structured around two main phases. We evaluate our pipeline from
 
 ---
 
-### Phase 2: Flow Matching Integration
-
-#### Experiment 1: Baseline Conditional Flow Matching (Pixel Space)
-* **Hypothesis:** Conditional Flow Matching (CFM) can successfully learn a vector field that maps a healthy X-ray distribution to a pneumonia-infected distribution in the medical image domain.
-* **Setup (Dataset & Model):** CFM integration applied directly on the pixel space of the PneumoniaMNIST dataset (images scaled to 224x224). We trained a vector field parameterized by a Vision Transformer conditioned on the timestep, randomly sampling from both sick and healthy distributions.
-* **Results:** The model successfully learned the vector field dynamics. During inference, Euler integration generated continuous trajectories that pushed healthy origin images towards the pathological distribution. A quantitative evaluation using a classifier confirmed that the probability of pneumonia increased progressively and consistently at each timestep of the trajectory.
-* **Conclusions:** We consider this a highly successful baseline experiment. It proves that Conditional Flow Matching is an appropriate and effective approach to modeling disease progression trajectories in medical imaging, validated both by direct visual inspection and quantitative classifier scores.
+### Flow Matching Integration
 
 #### Experiment 3: Latent Space Flow Matching
 * **Objective:** Accelerate the Flow Matching training process by operating in a lower-dimensional latent space, comparing the representations of the Spatial VAE and the ViT.

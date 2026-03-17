@@ -23,7 +23,7 @@ Project advisor:
 
 **Goal:** Learn a generative transformation that takes a healthy medical image and produces a partially-ill / progressively-ill image, performing an interpolation along a disease trajectory using Flow Matching.
 
-**The Pipeline:** Image → Encode to latent space → Flow Matching in latent space → Decode to pathological image.
+**The Pipeline:** Image → Encode to latent space → Flow Matching in latent space → Generate a disease trajectory.
 
 Conditional Flow Matching (CFM) is a deep generative model framework that allows for generating samples from one distribution given samples from another, learning a mapping between both distributions parameterized by a vector field. It provides a simulation-free learning step, improving training efficiency over diffusion models.
 

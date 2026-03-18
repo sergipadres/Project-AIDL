@@ -99,6 +99,13 @@ Validation with a classification model (DINO) shows that, at the start, the prob
 ![Experiment 4 validation](./assets/exp_4_validation.png)
 
 
+<br>
+
+### Summary of the architecture
+
+![Architecture MFM](./assets/architecture_MFM.png.png)
+
+
 ---
 
 ## 3. Repository Structure

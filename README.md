@@ -103,7 +103,7 @@ Validation with a classification model (DINO) shows that, at the start, the prob
 
 ### Summary of the architecture
 
-![Architecture MFM](./assets/architecture_MFM.png.png)
+![Architecture MFM](./assets/architecture_MFM.png)
 
 
 ---

@@ -147,7 +147,7 @@ Project-AIDL/
 ## 5. Model Weights & Local Setup (Important)
 Due to GitHub's file size limits, the pre-trained weights (.pth files) for the Spatial VAE, ViT Autoencoder, and Flow Matching models are hosted externally. To run the evaluation notebooks without training from scratch:
 
-Download the pre-trained weights from this Google Drive link: [[DRIVE_LINK_HERE]](https://drive.google.com/drive/folders/1HDWsSll5IIMiHvqHojwcuAqa8Vlmib7C).
+Download the pre-trained weights from this Google Drive link: [Project AIDL](https://drive.google.com/drive/folders/1ZYXsEjA0edhhSSgTYlaL42qbwgy_dtqA?usp=sharing).
 
 Place the downloaded .pth files inside the checkpoints/ folder of this repository.
 
